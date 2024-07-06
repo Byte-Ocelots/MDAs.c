@@ -127,6 +127,7 @@ uint8_t *MD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		C += CC;
 		D += DD;
 	}
+	printf("F >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
 	uint32_t ABCD[] = {A, B, C, D};
 

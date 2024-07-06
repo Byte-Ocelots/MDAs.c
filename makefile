@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
 	MV = move
 	SEP = \\
 else
-	RM = $(RM) -f
+	RM = rm -f
 	MV = mv
 	SEP = /
 endif
@@ -43,37 +43,40 @@ else
 endif
 
 # Default target
-all: build static test
+all: _shared _static _build _test clean_o
 
 # Build target for src/md files
-build: $(MD_BIN_FILES)
+_build: $(MD_BIN_FILES)
+build : _build clean_o
 
 # Rule to compile each .c file in src/md into its corresponding binary
 $(BIN_DIR)/%: $(SRC_MD_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
 	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $< -lm -lmd
 
 # Build target for static library
-static: $(STATIC_LIB)
+_static: $(STATIC_LIB)
+static : _static clean_o
 
 # Rule to create the static library from src/rfc files
 $(STATIC_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	ar rcs $@ $(RFC_OBJ_FILES)
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
 
 # Build target for shared library
-shared : $(SHARED_LIB)
+_shared: $(SHARED_LIB)
+shared : _shared clean_o
 
 # Rule to create the shared library from src/rfc files
 $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	$(CC) -shared -o $@ $(RFC_OBJ_FILES)
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
+	
 
 # Rule to compile each .c file in src/rfc into position-independent code (.o files)
 $(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
 
 # Build target for test files
-test: $(TEST_BIN_FILES)
+_test: $(TEST_BIN_FILES)
+test : _test clean_o
 
 # Rule to compile each .c file in test into its corresponding binary
 $(BIN_DIR)/%: $(TEST_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
@@ -91,4 +94,8 @@ $(LIB_DIR):
 clean:
 	$(RM) $(subst /,$(SEP),$(BIN_DIR)/* $(LIB_DIR)/* $(SRC_RFC_DIR)/*.o)
 
-.PHONY: all build static test clean
+# Clean target to remove compiled binaries and libraries
+clean_o:
+	$(RM) $(subst /,$(SEP),$(SRC_RFC_DIR)/*.o)
+
+.PHONY: all build static shared test clean

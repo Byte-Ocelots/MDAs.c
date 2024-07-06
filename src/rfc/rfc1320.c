@@ -2,7 +2,6 @@
 #include "funcs.h"
 
 void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X, uint32_t z)
-
 {
 	(*a) = ROTL(((*a) + OP(b, c, d) + X[k] + z), s);
 }
@@ -81,25 +80,25 @@ uint8_t *MD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		_a4(&B, C, D, A, 15, 19, F, X, 0);
 
 		// Round 2
-		_a4(&A, B, C, D, 0, 3, G, X, zs[1]);
-		_a4(&D, A, B, C, 4, 5, G, X, zs[1]);
-		_a4(&C, D, A, B, 8, 9, G, X, zs[1]);
-		_a4(&B, C, D, A, 12, 13, G, X, zs[1]);
+		_a4(&A, B, C, D, 0, 3, G4, X, zs[1]);
+		_a4(&D, A, B, C, 4, 5, G4, X, zs[1]);
+		_a4(&C, D, A, B, 8, 9, G4, X, zs[1]);
+		_a4(&B, C, D, A, 12, 13, G4, X, zs[1]);
 
-		_a4(&A, B, C, D, 1, 3, G, X, zs[1]);
-		_a4(&D, A, B, C, 5, 5, G, X, zs[1]);
-		_a4(&C, D, A, B, 9, 9, G, X, zs[1]);
-		_a4(&B, C, D, A, 13, 13, G, X, zs[1]);
+		_a4(&A, B, C, D, 1, 3, G4, X, zs[1]);
+		_a4(&D, A, B, C, 5, 5, G4, X, zs[1]);
+		_a4(&C, D, A, B, 9, 9, G4, X, zs[1]);
+		_a4(&B, C, D, A, 13, 13, G4, X, zs[1]);
 
-		_a4(&A, B, C, D, 2, 3, G, X, zs[1]);
-		_a4(&D, A, B, C, 6, 5, G, X, zs[1]);
-		_a4(&C, D, A, B, 10, 9, G, X, zs[1]);
-		_a4(&B, C, D, A, 14, 13, G, X, zs[1]);
+		_a4(&A, B, C, D, 2, 3, G4, X, zs[1]);
+		_a4(&D, A, B, C, 6, 5, G4, X, zs[1]);
+		_a4(&C, D, A, B, 10, 9, G4, X, zs[1]);
+		_a4(&B, C, D, A, 14, 13, G4, X, zs[1]);
 
-		_a4(&A, B, C, D, 3, 3, G, X, zs[1]);
-		_a4(&D, A, B, C, 7, 5, G, X, zs[1]);
-		_a4(&C, D, A, B, 11, 9, G, X, zs[1]);
-		_a4(&B, C, D, A, 15, 13, G, X, zs[1]);
+		_a4(&A, B, C, D, 3, 3, G4, X, zs[1]);
+		_a4(&D, A, B, C, 7, 5, G4, X, zs[1]);
+		_a4(&C, D, A, B, 11, 9, G4, X, zs[1]);
+		_a4(&B, C, D, A, 15, 13, G4, X, zs[1]);
 
 		// Round 3
 		_a4(&A, B, C, D, 0, 3, H, X, zs[2]);
@@ -127,7 +126,6 @@ uint8_t *MD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		C += CC;
 		D += DD;
 	}
-	printf("F >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
 	uint32_t ABCD[] = {A, B, C, D};
 

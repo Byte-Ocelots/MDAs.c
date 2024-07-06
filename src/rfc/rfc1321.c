@@ -2,9 +2,8 @@
 #include "funcs.h"
 
 void _a5(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t i, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X)
-
 {
-	(*a) = ROTL(((*a) + OP(b, c, d) + X[k] + (fabs(sin(i)) * pow(2, 32))), s);
+	(*a) = b + ROTL(((*a) + OP(b, c, d) + X[k] + (fabs(sin(i)) * pow(2, 32))), s);
 }
 
 uint8_t *MD5(uint8_t *message, uint64_t message_len, uint8_t *digest)
@@ -82,28 +81,28 @@ uint8_t *MD5(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		printf("1 >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
 		// Round 2
-		_a5(&A, B, C, D, 1, 5, 17, G, X);
-		_a5(&D, A, B, C, 6, 9, 18, G, X);
-		_a5(&C, D, A, B, 11, 14, 19, G, X);
-		_a5(&B, C, D, A, 0, 20, 20, G, X);
+		_a5(&A, B, C, D, 1, 5, 17, G5, X);
+		_a5(&D, A, B, C, 6, 9, 18, G5, X);
+		_a5(&C, D, A, B, 11, 14, 19, G5, X);
+		_a5(&B, C, D, A, 0, 20, 20, G5, X);
 		printf("2 >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
-		_a5(&A, B, C, D, 5, 5, 21, G, X);
-		_a5(&D, A, B, C, 10, 9, 22, G, X);
-		_a5(&C, D, A, B, 15, 14, 23, G, X);
-		_a5(&B, C, D, A, 4, 20, 24, G, X);
+		_a5(&A, B, C, D, 5, 5, 21, G5, X);
+		_a5(&D, A, B, C, 10, 9, 22, G5, X);
+		_a5(&C, D, A, B, 15, 14, 23, G5, X);
+		_a5(&B, C, D, A, 4, 20, 24, G5, X);
 		printf("2 >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
-		_a5(&A, B, C, D, 9, 5, 25, G, X);
-		_a5(&D, A, B, C, 14, 9, 26, G, X);
-		_a5(&C, D, A, B, 3, 14, 27, G, X);
-		_a5(&B, C, D, A, 8, 20, 28, G, X);
+		_a5(&A, B, C, D, 9, 5, 25, G5, X);
+		_a5(&D, A, B, C, 14, 9, 26, G5, X);
+		_a5(&C, D, A, B, 3, 14, 27, G5, X);
+		_a5(&B, C, D, A, 8, 20, 28, G5, X);
 		printf("2 >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
-		_a5(&A, B, C, D, 13, 5, 29, G, X);
-		_a5(&D, A, B, C, 2, 9, 30, G, X);
-		_a5(&C, D, A, B, 7, 14, 31, G, X);
-		_a5(&B, C, D, A, 12, 20, 32, G, X);
+		_a5(&A, B, C, D, 13, 5, 29, G5, X);
+		_a5(&D, A, B, C, 2, 9, 30, G5, X);
+		_a5(&C, D, A, B, 7, 14, 31, G5, X);
+		_a5(&B, C, D, A, 12, 20, 32, G5, X);
 		printf("2 >> A: %08X B: %08X C: %08X D: %08X\n", A, B, C, D);
 
 		// Round 3

@@ -1,0 +1,8 @@
+makefile
+t
+main*
+log*
+.vscode/
+*.exe
+lib/
+bin/*

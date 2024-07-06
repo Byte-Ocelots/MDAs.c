@@ -1,4 +1,4 @@
-#include "rfc1319.h"
+#include <md2.h>
 
 // MD2 S table
 static const uint8_t S[256] = {

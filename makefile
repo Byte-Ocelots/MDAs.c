@@ -43,44 +43,41 @@ else
 endif
 
 # Default target
-all: _shared _static _build _test clean_o
+all: build static test
 
 # Build target for src/md files
-_build: $(MD_BIN_FILES)
-build : _build clean_o
+build: $(MD_BIN_FILES)
 
 # Rule to compile each .c file in src/md into its corresponding binary
 $(BIN_DIR)/%: $(SRC_MD_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
 	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $< -lm -lmd
 
 # Build target for static library
-_static: $(STATIC_LIB)
-static : _static clean_o
+static: $(STATIC_LIB)
 
 # Rule to create the static library from src/rfc files
 $(STATIC_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	ar rcs $@ $(RFC_OBJ_FILES)
+	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
 
 # Build target for shared library
-_shared: $(SHARED_LIB)
-shared : _shared clean_o
+shared : $(SHARED_LIB)
 
 # Rule to create the shared library from src/rfc files
 $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	$(CC) -shared -o $@ $(RFC_OBJ_FILES)
-	
+	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
 
 # Rule to compile each .c file in src/rfc into position-independent code (.o files)
 $(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
 
 # Build target for test files
-_test: $(TEST_BIN_FILES)
-test : _test clean_o
+test: $(TEST_BIN_FILES)
 
 # Rule to compile each .c file in test into its corresponding binary
 $(BIN_DIR)/%: $(TEST_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
-	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lmd
+	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lmd -lm
 
 # Create the bin directory if it doesn't exist
 $(BIN_DIR):
@@ -94,8 +91,4 @@ $(LIB_DIR):
 clean:
 	$(RM) $(subst /,$(SEP),$(BIN_DIR)/* $(LIB_DIR)/* $(SRC_RFC_DIR)/*.o)
 
-# Clean target to remove compiled binaries and libraries
-clean_o:
-	$(RM) $(subst /,$(SEP),$(SRC_RFC_DIR)/*.o)
-
-.PHONY: all build static shared test clean
+.PHONY: all build static test clean

@@ -21,7 +21,7 @@ uint32_t G4(uint32_t X, uint32_t Y, uint32_t Z)
 
 uint32_t G5(uint32_t X, uint32_t Y, uint32_t Z)
 {
-	return (X & Z) | Y | (~Z);
+	return (X & Z) | (Y & (~Z));
 }
 
 uint32_t H(uint32_t X, uint32_t Y, uint32_t Z)

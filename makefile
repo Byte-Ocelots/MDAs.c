@@ -16,7 +16,7 @@ endif
 # Define directories
 SRC_MD_DIR = src/md
 SRC_RFC_DIR = src/rfc
-TEST_DIR = test
+TEST_DIR = tests
 BIN_DIR = bin
 LIB_DIR = lib
 

@@ -29,6 +29,7 @@ uint8_t *MD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	{
 		remaining_bits = 512 - shy_bits + 448;
 	}
+	
 	N = (b + remaining_bits + 64) / 8;
 	M = (uint8_t *)malloc(N);
 	memset(M, 0, N);

@@ -25,7 +25,8 @@ uint8_t *MD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	uint64_t remaining_bytes = 16 - (message_len % 16);
 	uint64_t N = message_len + remaining_bytes;
 	uint64_t _N = N + 16;
-	uint8_t M[_N], X[48], C[16], L;
+	uint8_t *M = (uint8_t *)malloc(_N);
+	uint8_t X[48], C[16], L;
 
 	memset(M, 0, _N);
 	memcpy(M, message, message_len);
@@ -73,6 +74,7 @@ uint8_t *MD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 			t = (t + j) % 256;
 		}
 	}
+	free(M);
 
 	// Step 5. Output
 	memcpy(digest, X, 16);

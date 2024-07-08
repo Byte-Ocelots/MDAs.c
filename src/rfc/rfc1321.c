@@ -144,6 +144,7 @@ uint8_t *MD5(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		C += CC;
 		D += DD;
 	}
+	free(M);
 
 	uint32_t ABCD[] = {A, B, C, D};
 

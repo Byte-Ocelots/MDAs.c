@@ -1,5 +1,5 @@
-#ifndef _RFC1319_H
-#define _RFC1319_H
+#ifndef INC_MD2
+#define INC_MD2
 
 #include <stdint.h>
 #include <stdio.h>

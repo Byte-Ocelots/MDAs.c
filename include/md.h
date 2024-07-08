@@ -1,5 +1,5 @@
-#ifndef MD_H
-#define MD_H
+#ifndef INC_MD
+#define INC_MD
 
 #include <md2.h>
 #include <md4.h>

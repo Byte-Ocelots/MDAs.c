@@ -122,7 +122,7 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
 		mkdir -p $(LIB_DIR)
 	else
-	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+		if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
 	endif
 else
 	mkdir -p $(LIB_DIR)
@@ -133,7 +133,7 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
 		mkdir -p $(INSTALL_DIR)
 	else
-	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+		if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
 	endif
 else
 	mkdir -p $(INSTALL_DIR)

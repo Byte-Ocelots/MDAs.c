@@ -1,4 +1,4 @@
-#include <md2.h>
+#include "cMD2.h"
 
 // MD2 S table
 static const uint8_t S[256] = {

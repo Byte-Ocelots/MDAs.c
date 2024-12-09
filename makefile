@@ -33,13 +33,13 @@ TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
 TEST_BIN_FILES = $(patsubst $(TEST_DIR)/%.c,$(BIN_DIR)/%,$(TEST_FILES))
 
 # Define the static library
-STATIC_LIB = $(LIB_DIR)/libmd.a
+STATIC_LIB = $(LIB_DIR)/libcMDA.a
 
 # Define the shared library
 ifeq ($(OS),Windows_NT)
-	SHARED_LIB = $(LIB_DIR)/md.dll
+	SHARED_LIB = $(LIB_DIR)/cMDA.dll
 else
-	SHARED_LIB = $(LIB_DIR)/md.so
+	SHARED_LIB = $(LIB_DIR)/cMDA.so
 endif
 
 # Default target
@@ -51,7 +51,7 @@ build: _build clean_o
 
 # Rule to compile each .c file in src/md into its corresponding binary
 $(BIN_DIR)/%: $(SRC_MD_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
-	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $< -lm -lmd
+	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $< -lm -lcMDA
 
 # Build target for static library
 _static: $(STATIC_LIB)
@@ -79,7 +79,7 @@ test : _test clean_o
 
 # Rule to compile each .c file in test into its corresponding binary
 $(BIN_DIR)/%: $(TEST_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
-	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lmd -lm
+	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lcMDA -lm
 
 # Create the bin directory if it doesn't exist
 $(BIN_DIR):

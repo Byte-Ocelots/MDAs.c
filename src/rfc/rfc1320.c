@@ -1,4 +1,4 @@
-#include <md4.h>
+#include "cMD4.h"
 #include "funcs.h"
 
 void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X, uint32_t z)

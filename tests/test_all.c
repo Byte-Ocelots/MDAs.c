@@ -1,4 +1,4 @@
-#include "cMDA.h"
+#include "cMDA/all.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,7 +54,7 @@ int main()
 		printf("expected: ");
 		print_hex(md2_expecteds[i], 16);
 		printf("\n");
-		MD2(messages[i], strlen((char *)messages[i]), md2_digest);
+		cMD2(messages[i], strlen((char *)messages[i]), md2_digest);
 		printf("output  : ");
 		print_hex(md2_digest, 16);
 		printf("\n");
@@ -70,7 +70,7 @@ int main()
 		printf("expected: ");
 		print_hex(md4_expecteds[i], 16);
 		printf("\n");
-		MD4(messages[i], strlen((char *)messages[i]), md4_digest);
+		cMD4(messages[i], strlen((char *)messages[i]), md4_digest);
 		printf("output  : ");
 		print_hex(md4_digest, 16);
 		printf("\n");
@@ -86,7 +86,7 @@ int main()
 		printf("expected: ");
 		print_hex(md5_expecteds[i], 16);
 		printf("\n");
-		MD5(messages[i], strlen((char *)messages[i]), md5_digest);
+		cMD5(messages[i], strlen((char *)messages[i]), md5_digest);
 		printf("output  : ");
 		print_hex(md5_digest, 16);
 		printf("\n");

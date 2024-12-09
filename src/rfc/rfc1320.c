@@ -1,4 +1,4 @@
-#include "cMD4.h"
+#include "cMDA/md4.h"
 #include "funcs.h"
 
 void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X, uint32_t z)
@@ -6,7 +6,7 @@ void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, 
 	(*a) = ROTL(((*a) + OP(b, c, d) + X[k] + z), s);
 }
 
-uint8_t *MD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
+uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 {
 	uint8_t *M = NULL;
 	uint32_t A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; // Step 3. Initialize MD Buffer

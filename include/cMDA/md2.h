@@ -1,5 +1,5 @@
-#ifndef INC_MD2
-#define INC_MD2
+#ifndef INC_cMD2
+#define INC_cMD2
 
 #include <stdint.h>
 #include <stdio.h>
@@ -8,6 +8,6 @@
 
 #define MD2_DIGEST_LENGTH 16
 
-uint8_t *MD2(uint8_t *message, uint64_t message_len, uint8_t *digest);
+uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest);
 
 #endif

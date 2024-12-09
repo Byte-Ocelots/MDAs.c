@@ -98,7 +98,7 @@ endif
 # Create the lib directory if it doesn't exist
 $(LIB_DIR):
 ifeq ($(OS),Windows_NT)
-	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+	mkdir -p $(LIB_DIR)
 else
 	mkdir -p $(LIB_DIR)
 endif

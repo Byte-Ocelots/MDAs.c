@@ -18,11 +18,6 @@ else
 	SHARED_F = cMDA.so
 endif
 
-WIN_DRIVE := $(shell echo %windir:~0,2%)
-
-# Print the drive letter (C: or whatever the Windows installation drive is)
-$(info Windows is installed on: $(WIN_DRIVE))
-
 # Define directories
 SRC_MD_DIR = src/md
 SRC_RFC_DIR = src/rfc

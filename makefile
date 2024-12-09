@@ -5,13 +5,23 @@ CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
 # Define RM, MV and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
 	RM = del /Q /F
+	CP = xcopy /Y /E /I
 	MV = move
 	SEP = \\
+	SHARED_F = cMDA.dll
+	INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
 else
 	RM = rm -f
+	CP = cp
 	MV = mv
 	SEP =/
+	SHARED_F = cMDA.so
 endif
+
+WIN_DRIVE := $(shell echo %windir:~0,2%)
+
+# Print the drive letter (C: or whatever the Windows installation drive is)
+$(info Windows is installed on: $(WIN_DRIVE))
 
 # Define directories
 SRC_MD_DIR = src/md
@@ -30,17 +40,11 @@ RFC_OBJ_FILES = $(patsubst $(SRC_RFC_DIR)/%.c,$(SRC_RFC_DIR)/%.o,$(SRC_RFC_FILES
 
 # Find all .c files in the test directory
 TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
-TEST_BIN_FILES = $(patsubst $(TEST_DIR)/%.c,$(BIN_DIR)/%,$(TEST_FILES))
+TEST_BIN_FILES = $(patsubst $(TEST_DIR)/%.c,$(TEST_DIR)/build/%,$(TEST_FILES))
 
 # Define the static library
 STATIC_LIB = $(LIB_DIR)/libcMDA.a
-
-# Define the shared library
-ifeq ($(OS),Windows_NT)
-	SHARED_LIB = $(LIB_DIR)/cMDA.dll
-else
-	SHARED_LIB = $(LIB_DIR)/cMDA.so
-endif
+SHARED_LIB = $(LIB_DIR)/$(SHARED_F)
 
 # Default target
 all: _static _shared _build _test clean_o
@@ -78,25 +82,38 @@ _test: $(TEST_BIN_FILES)
 test : _test clean_o
 
 # Rule to compile each .c file in test into its corresponding binary
-$(BIN_DIR)/%: $(TEST_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
+$(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lcMDA -lm
 
 # Create the bin directory if it doesn't exist
 $(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+	if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
+
+$(TEST_DIR)/build:
+	if not exist "$(subst /,$(SEP),$(TEST_DIR)/build)" mkdir "$(subst /,$(SEP),$(TEST_DIR)/build)"
 
 # Create the lib directory if it doesn't exist
 $(LIB_DIR):
-	mkdir -p $(LIB_DIR)
+	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+
+install: _static _shared _build clean_o
+	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	
+	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib) 
+	$(CP) include $(subst /,$(SEP),$(INSTALL_DIR)/include) 
+	$(CP) bin $(subst /,$(SEP),$(INSTALL_DIR)/bin) 
 
 # Clean target to remove compiled binaries and libraries
-clean:
-	$(RM) $(subst /,$(SEP),$(BIN_DIR)/* $(LIB_DIR)/* $(SRC_RFC_DIR)/*.o)
-
 clean_bin:
 	$(RM) $(subst /,$(SEP),$(BIN_DIR)/*)
 
+clean_tests:
+	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build) 
+
 clean_o:
 	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
+
+
+clean: clean_bin clean_tests clean_o
 
 .PHONY: all shared build static test clean clean_o

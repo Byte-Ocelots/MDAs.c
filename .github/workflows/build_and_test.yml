@@ -50,7 +50,7 @@ jobs:
           make
 
     - name: Add MSYS2 to PATH
-      run: echo "::add-path::${{ runner.tool_cache }}/msys64/mingw64/bin"
+      run: echo "${{ runner.tool_cache }}\\windows\\msys64\\mingw64\\bin" >> $GITHUB_PATH
 
     - name: Build the project
       run: make all

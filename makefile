@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89 
+CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
 
 # Define RM, MV and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
@@ -79,7 +79,7 @@ $(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c
 
 # Build target for test files
 _test: $(TEST_BIN_FILES)
-test : _test clean_o
+tests : _test clean_o
 
 # Rule to compile each .c file in test into its corresponding binary
 $(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
@@ -87,17 +87,33 @@ $(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
 
 # Create the bin directory if it doesn't exist
 $(BIN_DIR):
+ifeq ($(OS),Windows_NT)
 	if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
+else
+	mkdir -p $(BIN_DIR)
+endif
 
 $(TEST_DIR)/build:
+ifeq ($(OS),Windows_NT)
 	if not exist "$(subst /,$(SEP),$(TEST_DIR)/build)" mkdir "$(subst /,$(SEP),$(TEST_DIR)/build)"
+else
+	mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
+endif
 
 # Create the lib directory if it doesn't exist
 $(LIB_DIR):
+ifeq ($(OS),Windows_NT)
 	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+else
+	mkdir -p $(LIB_DIR)
+endif
 
 install: _static _shared _build clean_o
+ifeq ($(OS),Windows_NT)
 	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+else
+	mkdir -p $(INSTALL_DIR)
+endif
 	
 	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib) 
 	$(CP) include $(subst /,$(SEP),$(INSTALL_DIR)/include) 

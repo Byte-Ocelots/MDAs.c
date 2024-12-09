@@ -53,9 +53,11 @@ jobs:
       run: echo "${{ runner.tool_cache }}\\windows\\msys64\\mingw64\\bin" >> $GITHUB_PATH
 
     - name: Build the project
+      shell: cmd
       run: make all
 
     - name: Build and run tests
+      shell: cmd
       run: |
         make tests
         ./tests/build/test_all

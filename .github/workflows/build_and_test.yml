@@ -1,0 +1,59 @@
+name: C Build and Test Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test-linux:
+    name: Build and Test on Linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential valgrind
+
+    - name: Build the project
+      run: make all
+
+    - name: Build and run tests
+      run: |
+        make tests
+        ./tests/build/test_all
+
+    - name: Run Valgrind to check for memory leaks
+      run: valgrind --leak-check=full ./test_all
+
+  build-and-test-windows:
+    name: Build and Test on Windows
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        install: >-
+          mingw-w64-x86_64-gcc
+          make
+
+    - name: Add MSYS2 to PATH
+      run: echo "::add-path::${{ runner.tool_cache }}/msys64/mingw64/bin"
+
+    - name: Build the project
+      run: make all
+
+    - name: Build and run tests
+      run: |
+        make tests
+        ./tests/build/test_all

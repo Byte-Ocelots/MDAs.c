@@ -18,6 +18,10 @@ else
 	INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
 endif
 
+# Echo the current shell explicitly
+$(info Current shell is: $(shell echo $$SHELL))
+$(info $(findstring bash,$(shell echo $$SHELL)))
+
 # Define directories
 SRC_MD_DIR = src/md
 SRC_RFC_DIR = src/rfc

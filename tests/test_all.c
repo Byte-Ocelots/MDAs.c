@@ -6,7 +6,9 @@
 
 void print_hex(uint8_t *data, uint8_t data_len)
 {
-	for (uint8_t i = 0; i < data_len; i++)
+	uint8_t i;
+
+	for (i = 0; i < data_len; i++)
 	{
 		printf("%02x", data[i]);
 	}
@@ -14,6 +16,8 @@ void print_hex(uint8_t *data, uint8_t data_len)
 
 int main()
 {
+	uint8_t i;
+
 	uint8_t *messages[] = {
 		(uint8_t *)"a",
 		(uint8_t *)"abc",
@@ -47,7 +51,7 @@ int main()
 	uint8_t md5_digest[MD5_DIGEST_LENGTH];
 
 	printf("\n##### MD2 #####\n");
-	for (uint8_t i = 0; i < 5; i++)
+	for (i = 0; i < 5; i++)
 	{
 		printf("\n");
 		printf("message : %s\n", messages[i]);
@@ -63,7 +67,7 @@ int main()
 	printf("\n===============\n");
 
 	printf("\n##### MD4 #####\n");
-	for (uint8_t i = 0; i < 5; i++)
+	for (i = 0; i < 5; i++)
 	{
 		printf("\n");
 		printf("message : %s\n", messages[i]);
@@ -79,7 +83,7 @@ int main()
 	printf("\n===============\n");
 
 	printf("\n##### MD5 #####\n");
-	for (uint8_t i = 0; i < 5; i++)
+	for (i = 0; i < 5; i++)
 	{
 		printf("\n");
 		printf("message : %s\n", messages[i]);

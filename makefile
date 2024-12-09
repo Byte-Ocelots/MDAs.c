@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra
+CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89 
 
 # Define RM, MV and SEP command specific to platform
 ifeq ($(OS),Windows_NT)

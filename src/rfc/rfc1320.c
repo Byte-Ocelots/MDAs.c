@@ -8,8 +8,12 @@ void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, 
 
 uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 {
+	uint64_t i;
+	uint32_t ABCD[4];
+	uint8_t j;
+
 	uint8_t *M = NULL;
-	uint32_t A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; // Step 3. Initialize MD Buffer
+	uint32_t A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; /* Step 3. Initialize MD Buffer */
 	uint32_t AA, BB, CC, DD;
 	uint32_t X[16];
 	uint32_t zs[3] = {0x0,
@@ -20,7 +24,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	uint64_t remaining_bits;
 	uint64_t N;
 
-	// Step 1. Append Padding Bits
+	/* Step 1. Append Padding Bits */
 	if (shy_bits < 448)
 	{
 		remaining_bits = 448 - shy_bits;
@@ -37,16 +41,16 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	memset(M + message_len, 0, remaining_bits / 8);
 	M[message_len] = 1 << 7;
 
-	// Step 2. Append Length
-	for (uint8_t i = 0; i < 8; i++)
+	/* Step 2. Append Length */
+	for (i = 0; i < 8; i++)
 	{
 		M[N - 8 + i] = (uint8_t)(b >> i * 8) & 0xFF;
 	}
 
-	// Step 4. Process Message in 16-Word Blocks
-	for (uint64_t i = 0; i <= N / 64 - 1; i++)
+	/* Step 4. Process Message in 16-Word Blocks */
+	for (i = 0; i <= N / 64 - 1; i++)
 	{
-		for (uint8_t j = 0; j <= 15; j++)
+		for (j = 0; j <= 15; j++)
 		{
 			X[j] = (uint32_t)M[i * 64 + j * 4] |
 				   ((uint32_t)M[i * 64 + j * 4 + 1] << 8) |
@@ -59,7 +63,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		CC = C;
 		DD = D;
 
-		// Round 1
+		/* Round 1 */
 		_a4(&A, B, C, D, 0, 3, F, X, 0);
 		_a4(&D, A, B, C, 1, 7, F, X, 0);
 		_a4(&C, D, A, B, 2, 11, F, X, 0);
@@ -80,7 +84,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		_a4(&C, D, A, B, 14, 11, F, X, 0);
 		_a4(&B, C, D, A, 15, 19, F, X, 0);
 
-		// Round 2
+		/* Round 2 */
 		_a4(&A, B, C, D, 0, 3, G4, X, zs[1]);
 		_a4(&D, A, B, C, 4, 5, G4, X, zs[1]);
 		_a4(&C, D, A, B, 8, 9, G4, X, zs[1]);
@@ -101,7 +105,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 		_a4(&C, D, A, B, 11, 9, G4, X, zs[1]);
 		_a4(&B, C, D, A, 15, 13, G4, X, zs[1]);
 
-		// Round 3
+		/* Round 3 */
 		_a4(&A, B, C, D, 0, 3, H, X, zs[2]);
 		_a4(&D, A, B, C, 8, 9, H, X, zs[2]);
 		_a4(&C, D, A, B, 4, 11, H, X, zs[2]);
@@ -129,9 +133,12 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	}
 	free(M);
 
-	uint32_t ABCD[] = {A, B, C, D};
+	ABCD[0] = A;
+	ABCD[1] = B;
+	ABCD[2] = C;
+	ABCD[3] = D;
 
-	for (size_t i = 0; i < 4; ++i)
+	for (i = 0; i < 4; ++i)
 	{
 		digest[i * 4] = (uint8_t)(ABCD[i] & 0xFF);
 		digest[i * 4 + 1] = (uint8_t)((ABCD[i] >> 8) & 0xFF);

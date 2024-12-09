@@ -1,6 +1,6 @@
 #include "cMDA/md2.h"
 
-// MD2 S table
+/* MD2 S table */
 static const uint8_t S[256] = {
 	0x29, 0x2E, 0x43, 0xC9, 0xA2, 0xD8, 0x7C, 0x01, 0x3D, 0x36, 0x54, 0xA1, 0xEC, 0xF0, 0x06, 0x13,
 	0x62, 0xA7, 0x05, 0xF3, 0xC0, 0xC7, 0x73, 0x8C, 0x98, 0x93, 0x2B, 0xD9, 0xBC, 0x4C, 0x82, 0xCA,
@@ -21,7 +21,9 @@ static const uint8_t S[256] = {
 
 uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 {
-	// Step 1. Append Padding Bytes
+	uint8_t i, j, k, t;
+
+	/* Step 1. Append Padding Bytes */
 	uint64_t remaining_bytes = 16 - (message_len % 16);
 	uint64_t N = message_len + remaining_bytes;
 	uint64_t _N = N + 16;
@@ -32,13 +34,13 @@ uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	memcpy(M, message, message_len);
 	memset(M + message_len, remaining_bytes, remaining_bytes);
 
-	// Step 2. Append Checksum
+	/* Step 2. Append Checksum */
 	memset(C, 0, 16);
 	L = 0;
-	// Process each 16-word block.
-	for (uint8_t i = 0; i <= N / 16 - 1; i++)
+	/* Process each 16-word block. */
+	for (i = 0; i <= N / 16 - 1; i++)
 	{
-		for (uint8_t j = 0; j <= 15; j++)
+		for (j = 0; j <= 15; j++)
 		{
 			C[j] ^= S[M[i * 16 + j] ^ L];
 			L = C[j];
@@ -46,27 +48,27 @@ uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	}
 	memcpy(M + N, C, 16);
 
-	// Step 3. Initialize MD Buffer
+	/* Step 3. Initialize MD Buffer */
 	memset(X, 0, 48);
 
-	// Step 4. Process Message in 16-Byte Blocks
-	// Process each 16-word block.
-	for (uint8_t i = 0; i <= _N / 16 - 1; i++)
+	/* Step 4. Process Message in 16-Byte Blocks */
+	/* Process each 16-word block. */
+	for (i = 0; i <= _N / 16 - 1; i++)
 	{
-		// Copy block i into X
-		for (uint8_t j = 0; j <= 15; j++)
+		/* Copy block i into X */
+		for (j = 0; j <= 15; j++)
 		{
 			X[16 + j] = M[i * 16 + j];
 			X[32 + j] = (X[16 + j] ^ X[j]);
 		}
 
-		uint8_t t = 0;
+		t = 0;
 
-		// Do 18 rounds
-		for (uint8_t j = 0; j <= 17; j++)
+		/* Do 18 rounds */
+		for (j = 0; j <= 17; j++)
 		{
-			// Round j
-			for (uint8_t k = 0; k <= 47; k++)
+			/* Round j */
+			for (k = 0; k <= 47; k++)
 			{
 				t = X[k] ^= S[t];
 			}
@@ -76,8 +78,8 @@ uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	}
 	free(M);
 
-	// Step 5. Output
-	memcpy(digest, X, 16);
+	/* Step 5. Output */
+	memcpy(digest, X, MD2_DIGEST_LENGTH);
 
 	return digest;
 }

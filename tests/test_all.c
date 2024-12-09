@@ -1,5 +1,6 @@
 #include "cMDA/all.h"
 #include <stdint.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -46,57 +47,20 @@ int main()
 		{0x8c, 0x4d, 0x8f, 0x13, 0x5c, 0xba, 0xbe, 0x82, 0x8c, 0x2e, 0x14, 0x0c, 0x32, 0x8b, 0xe3, 0xd0},
 		{0xa9, 0x82, 0xc1, 0x34, 0x93, 0xc5, 0x39, 0x96, 0x0f, 0x6f, 0xf3, 0xb9, 0x66, 0x21, 0xfd, 0x64}};
 
-	uint8_t md2_digest[MD2_DIGEST_LENGTH];
-	uint8_t md4_digest[MD4_DIGEST_LENGTH];
-	uint8_t md5_digest[MD5_DIGEST_LENGTH];
+	uint8_t md2_digest[16], md4_digest[16], md5_digest[16];
 
-	printf("\n##### MD2 #####\n");
 	for (i = 0; i < 5; i++)
 	{
-		printf("\n");
-		printf("message : %s\n", messages[i]);
-		printf("expected: ");
-		print_hex(md2_expecteds[i], 16);
-		printf("\n");
 		cMD2(messages[i], strlen((char *)messages[i]), md2_digest);
-		printf("output  : ");
-		print_hex(md2_digest, 16);
-		printf("\n");
-		printf("matches?: %s\n", memcmp(md2_digest, md2_expecteds[i], 16) ? "false" : "true");
-	}
-	printf("\n===============\n");
+		assert(memcmp(md2_digest, md2_expecteds[i], 16) == 0);
 
-	printf("\n##### MD4 #####\n");
-	for (i = 0; i < 5; i++)
-	{
-		printf("\n");
-		printf("message : %s\n", messages[i]);
-		printf("expected: ");
-		print_hex(md4_expecteds[i], 16);
-		printf("\n");
 		cMD4(messages[i], strlen((char *)messages[i]), md4_digest);
-		printf("output  : ");
-		print_hex(md4_digest, 16);
-		printf("\n");
-		printf("matches?: %s\n", memcmp(md4_digest, md4_expecteds[i], 16) ? "false" : "true");
-	}
-	printf("\n===============\n");
+		assert(memcmp(md4_digest, md4_expecteds[i], 16) == 0);
 
-	printf("\n##### MD5 #####\n");
-	for (i = 0; i < 5; i++)
-	{
-		printf("\n");
-		printf("message : %s\n", messages[i]);
-		printf("expected: ");
-		print_hex(md5_expecteds[i], 16);
-		printf("\n");
 		cMD5(messages[i], strlen((char *)messages[i]), md5_digest);
-		printf("output  : ");
-		print_hex(md5_digest, 16);
-		printf("\n");
-		printf("matches?: %s\n", memcmp(md5_digest, md5_expecteds[i], 16) ? "false" : "true");
+		assert(memcmp(md5_digest, md5_expecteds[i], 16) == 0);
 	}
-	printf("\n===============\n");
 
+	printf("All tests passed successfully!\n");
 	return 0;
 }

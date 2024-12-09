@@ -41,23 +41,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        install: >-
-          mingw-w64-x86_64-gcc
-          make
+    - name: Set up GCC with Chocolatey
+      shell: cmd
+      run: |
+        choco install mingw -y
+        setx PATH "%PATH%;C:\tools\mingw64\bin"
 
-    - name: Add MSYS2 to PATH
-      run: echo "${{ runner.tool_cache }}\\windows\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+    - name: Verify GCC Installation
+      shell: cmd
+      run: |
+        gcc --version
+        make --version
 
     - name: Build the project
       shell: cmd
-      run: make all
+      run: |
+        make all
 
     - name: Build and run tests
       shell: cmd
       run: |
         make tests
-        ./tests/build/test_all
+        .\tests\build\test_all.exe

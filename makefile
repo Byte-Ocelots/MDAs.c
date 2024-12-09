@@ -3,20 +3,29 @@ CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
 
 # Define RM, MV and SEP command specific to platform
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+ifeq ($(OS),Windows_NT)
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		RM = rm -f
+		CP = cp
+		MV = mv
+		SEP =/
+		SHARED_F = cMDA.so
+	else
+		RM = del /Q /F
+		CP = xcopy /Y /E /I
+		MV = move
+		SEP = \\
+		SHARED_F = cMDA.dll
+		INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
+	endif
+else
 	RM = rm -f
 	CP = cp
 	MV = mv
 	SEP =/
 	SHARED_F = cMDA.so
-else
-	RM = del /Q /F
-	CP = xcopy /Y /E /I
-	MV = move
-	SEP = \\
-	SHARED_F = cMDA.dll
-	INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
 endif
+
 
 # Echo the current shell explicitly
 $(info Current shell is: $(shell echo $$SHELL))
@@ -86,32 +95,48 @@ $(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
 
 # Create the bin directory if it doesn't exist
 $(BIN_DIR):
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(BIN_DIR)
+ifeq ($(OS),Windows_NT)
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		mkdir -p $(BIN_DIR)
+	else
+		if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
+	endif
 else
-	if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
+	mkdir -p $(BIN_DIR)
 endif
 
 $(TEST_DIR)/build:
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
+ifeq ($(OS),Windows_NT)
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
+	else
+		if not exist "$(subst /,$(SEP),$(TEST_DIR)/build)" mkdir "$(subst /,$(SEP),$(TEST_DIR)/build)"
+	endif
 else
-	if not exist "$(subst /,$(SEP),$(TEST_DIR)/build)" mkdir "$(subst /,$(SEP),$(TEST_DIR)/build)"
+	mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
 endif
 
 # Create the lib directory if it doesn't exist
 $(LIB_DIR):
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(LIB_DIR)
-else
+ifeq ($(OS),Windows_NT)
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		mkdir -p $(LIB_DIR)
+	else
 	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+	endif
+else
+	mkdir -p $(LIB_DIR)
 endif
 
 install: _static _shared _build clean_o
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(INSTALL_DIR)
-else
+ifeq ($(OS),Windows_NT)
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		mkdir -p $(INSTALL_DIR)
+	else
 	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	endif
+else
+	mkdir -p $(INSTALL_DIR)
 endif
 	
 	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib) 

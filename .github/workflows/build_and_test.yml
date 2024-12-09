@@ -31,7 +31,7 @@ jobs:
         ./tests/build/test_all
 
     - name: Run Valgrind to check for memory leaks
-      run: valgrind --leak-check=full ./test_all
+      run: valgrind --leak-check=full ./tests/build/test_all
 
   build-and-test-windows:
     name: Build and Test on Windows

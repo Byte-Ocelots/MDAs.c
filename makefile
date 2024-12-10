@@ -38,6 +38,11 @@ LIB_DIR = lib
 
 # Find all .c files in the src/md directory
 SRC_MD_FILES = $(wildcard $(SRC_MD_DIR)/md*.c)
+MD_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(SRC_MD_FILES))
+
+OTHER_SRC_FILES = $(filter-out $(SRC_MD_DIR)/md%.c, $(wildcard $(SRC_MD_DIR)/*.c))
+OTHER_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(OTHER_SRC_FILES))
+
 MD_BIN_FILES = $(patsubst $(SRC_MD_DIR)/%.c,$(BIN_DIR)/%,$(SRC_MD_FILES))
 
 # Find all .c files in the src/rfc directory
@@ -59,9 +64,13 @@ all: _static _shared _build _test clean_o
 _build: $(MD_BIN_FILES)
 build: _build clean_o
 
+# Rule to compile each .c file into its corresponding .o object file
+$(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Rule to compile each .c file in src/md into its corresponding binary
-$(BIN_DIR)/%: $(SRC_MD_DIR)/%.c | $(BIN_DIR) $(STATIC_LIB)
-	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $< -lm -lcMDA
+$(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(OTHER_OBJ_FILES) | $(BIN_DIR) $(STATIC_LIB)
+	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $^ -lm -lcMDA
 
 # Build target for static library
 _static: $(STATIC_LIB)

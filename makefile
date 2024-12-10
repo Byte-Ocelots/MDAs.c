@@ -9,6 +9,7 @@ $(info $(findstring bash,$(shell echo $$SHELL)))
 # Define RM, MV and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
 	SHARED_F = cMDA.dll
+	INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
 	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
 		RM = rm -f
 		CP = cp
@@ -19,7 +20,6 @@ ifeq ($(OS),Windows_NT)
 		CP = xcopy /Y /E /I
 		MV = move
 		SEP = \\
-		INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
 	endif
 else
 	RM = rm -f
@@ -37,7 +37,7 @@ BIN_DIR = bin
 LIB_DIR = lib
 
 # Find all .c files in the src/md directory
-SRC_MD_FILES = $(wildcard $(SRC_MD_DIR)/*.c)
+SRC_MD_FILES = $(wildcard $(SRC_MD_DIR)/md*.c)
 MD_BIN_FILES = $(patsubst $(SRC_MD_DIR)/%.c,$(BIN_DIR)/%,$(SRC_MD_FILES))
 
 # Find all .c files in the src/rfc directory

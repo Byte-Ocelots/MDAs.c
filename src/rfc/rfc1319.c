@@ -21,7 +21,7 @@ static const uint8_t S[256] = {
 
 uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest)
 {
-	uint8_t i, j, k, t;
+	uint64_t i, j, k, t;
 
 	/* Step 1. Append Padding Bytes */
 	uint64_t remaining_bytes = 16 - (message_len % 16);

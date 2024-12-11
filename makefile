@@ -6,27 +6,27 @@ CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
 $(info Current shell is: $(shell echo $$SHELL))
 $(info $(findstring bash,$(shell echo $$SHELL)))
 
-# Define RM, MV and SEP command specific to platform
+# Define RM, MV, and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
-	SHARED_F = cMDA.dll
-	INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
-	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-		RM = rm -f
-		CP = cp
-		MV = mv
-		SEP =/
-	else
-		RM = del /Q /F
-		CP = xcopy /Y /E /I
-		MV = move
-		SEP = \\
-	endif
+    SHARED_F = cMDA.dll
+    INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
+    ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+        RM = rm -f
+        CP = cp
+        MV = mv
+        SEP = / 
+    else
+        RM = del /Q /F
+        CP = xcopy /Y /E /I
+        MV = move
+        SEP = \\
+    endif
 else
-	RM = rm -f
-	CP = cp
-	MV = mv
-	SEP =/
-	SHARED_F = cMDA.so
+    RM = rm -f
+    CP = cp
+    MV = mv
+    SEP = /
+    SHARED_F = cMDA.so
 endif
 
 # Define directories
@@ -66,11 +66,11 @@ build: _build clean_o
 
 # Rule to compile each .c file into its corresponding .o object file
 $(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -lm
 
 # Rule to compile each .c file in src/md into its corresponding binary
 $(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(OTHER_OBJ_FILES) | $(BIN_DIR) $(STATIC_LIB)
-	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $^ -lm -lcMDA
+	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $^ -lcMDA -lm
 
 # Build target for static library
 _static: $(STATIC_LIB)
@@ -90,7 +90,7 @@ $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 
 # Rule to compile each .c file in src/rfc into position-independent code (.o files)
 $(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c
-	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
+	$(CC) $(CFLAGS) -fPIC -c -o $@ $< -lm
 
 # Build target for test files
 _test: $(TEST_BIN_FILES)
@@ -100,41 +100,21 @@ tests : _test clean_o
 $(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lcMDA -lm
 
-# Create the bin directory if it doesn't exist
-$(BIN_DIR):
+# Create the bin, lib, and test directories if they don't exist
+$(BIN_DIR) $(LIB_DIR) $(TEST_DIR)/build:
 ifeq ($(OS),Windows_NT)
 ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR) $(LIB_DIR) $(TEST_DIR)/build
 else
 	if not exist "$(BIN_DIR)" mkdir "$(BIN_DIR)"
-endif
-else
-	mkdir -p $(BIN_DIR)
-endif
-
-$(TEST_DIR)/build:
-ifeq ($(OS),Windows_NT)
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-		mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
-else
-		if not exist "$(subst /,$(SEP),$(TEST_DIR)/build)" mkdir "$(subst /,$(SEP),$(TEST_DIR)/build)"
-endif
-else
-	mkdir -p $(subst /,$(SEP),$(TEST_DIR)/build)
-endif
-
-# Create the lib directory if it doesn't exist
-$(LIB_DIR):
-ifeq ($(OS),Windows_NT)
-ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-	mkdir -p $(LIB_DIR)
-else
 	if not exist "$(LIB_DIR)" mkdir "$(LIB_DIR)"
+	if not exist "$(TEST_DIR)/build" mkdir "$(TEST_DIR)/build"
 endif
 else
-	mkdir -p $(LIB_DIR)
+	mkdir -p $(BIN_DIR) $(LIB_DIR) $(TEST_DIR)/build
 endif
 
+# Install the files
 install: _static _shared _build clean_o
 ifeq ($(OS),Windows_NT)
 ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
@@ -145,21 +125,20 @@ endif
 else
 	mkdir -p $(INSTALL_DIR)
 endif
-	
-	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib) 
-	$(CP) include $(subst /,$(SEP),$(INSTALL_DIR)/include) 
-	$(CP) bin $(subst /,$(SEP),$(INSTALL_DIR)/bin) 
+
+	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib)
+	$(CP) include $(subst /,$(SEP),$(INSTALL_DIR)/include)
+	$(CP) bin $(subst /,$(SEP),$(INSTALL_DIR)/bin)
 
 # Clean target to remove compiled binaries and libraries
 clean_bin:
 	$(RM) $(subst /,$(SEP),$(BIN_DIR)/*)
 
 clean_tests:
-	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build/*) 
+	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build/*)
 
 clean_o:
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES))
-
+	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
 
 clean: clean_bin clean_tests clean_o
 

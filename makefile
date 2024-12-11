@@ -4,7 +4,6 @@ CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
 
 # Echo the current shell explicitly
 $(info Current shell is: $(shell echo $$SHELL))
-$(info $(findstring bash,$(shell echo $$SHELL)))
 
 # Define RM, MV, and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
@@ -22,12 +21,20 @@ ifeq ($(OS),Windows_NT)
         SEP = \\
     endif
 else
+	PREFIX ?= /usr/local
+	LIN_BIN_DIR = $(PREFIX)/bin
+	LIN_LIB_DIR = $(PREFIX)/lib
+	LIN_INC_DIR = $(PREFIX)/include/cMDA
     RM = rm -f
     CP = cp
     MV = mv
     SEP = /
     SHARED_F = cMDA.so
 endif
+
+# Default target
+all: static shared build tests
+all-c: all clean-o clean-d
 
 # Define directories
 SRC_MD_DIR = src/md
@@ -37,13 +44,13 @@ BIN_DIR = bin
 LIB_DIR = lib
 
 # Find all .c files in the src/md directory
-SRC_MD_FILES = $(wildcard $(SRC_MD_DIR)/md*.c)
-MD_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(SRC_MD_FILES))
+SRC_MD_MD_FILES = $(wildcard $(SRC_MD_DIR)/md*.c)
+MD_MD_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(SRC_MD_MD_FILES))
 
-OTHER_SRC_FILES = $(filter-out $(SRC_MD_DIR)/md%.c, $(wildcard $(SRC_MD_DIR)/*.c))
-OTHER_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(OTHER_SRC_FILES))
+SRC_MD_OTHER_FILES = $(filter-out $(SRC_MD_DIR)/md%.c, $(wildcard $(SRC_MD_DIR)/*.c))
+MD_OTHER_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(SRC_MD_OTHER_FILES))
 
-MD_BIN_FILES = $(patsubst $(SRC_MD_DIR)/%.c,$(BIN_DIR)/%,$(SRC_MD_FILES))
+MD_BIN_FILES = $(patsubst $(SRC_MD_DIR)/%.c,$(BIN_DIR)/%,$(SRC_MD_MD_FILES))
 
 # Find all .c files in the src/rfc directory
 SRC_RFC_FILES = $(wildcard $(SRC_RFC_DIR)/*.c)
@@ -57,48 +64,72 @@ TEST_BIN_FILES = $(patsubst $(TEST_DIR)/%.c,$(TEST_DIR)/build/%,$(TEST_FILES))
 STATIC_LIB = $(LIB_DIR)/libcMDA.a
 SHARED_LIB = $(LIB_DIR)/$(SHARED_F)
 
-# Default target
-all: _static _shared _build _test clean_o
+# DEP FILES
+DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/md*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
+
+# Include the generated dependency files
+-include $(DEP_FILES)
+
+# Rule to generate .d files for src/md/*.c
+$(SRC_MD_DIR)/%.d: $(SRC_MD_DIR)/%.c
+	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
+
+# Rule to generate .d files for src/rfc/*.c
+$(SRC_RFC_DIR)/%.d: $(SRC_RFC_DIR)/%.c
+	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
+
+# Rule to generate .d files for tests/*.c
+$(TEST_DIR)/%.d: $(TEST_DIR)/%.c
+	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
 
 # Build target for src/md files
-_build: $(MD_BIN_FILES)
-build: _build clean_o
+build: $(MD_BIN_FILES)
+build-c: build clean-o clean-d
 
 # Rule to compile each .c file into its corresponding .o object file
-$(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c
+$(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c $(SRC_MD_DIR)/%.d
 	$(CC) $(CFLAGS) -c $< -o $@ -lm
 
 # Rule to compile each .c file in src/md into its corresponding binary
-$(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(OTHER_OBJ_FILES) | $(BIN_DIR) $(STATIC_LIB)
+$(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(MD_OTHER_OBJ_FILES) | $(BIN_DIR) $(STATIC_LIB)
 	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $^ -lcMDA -lm
 
+
+# --------------------------------- shared and static lib rules ---------------------------------
+
+# Rule to compile each .c file in src/rfc into position-independent code (.o files)
+$(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c $(SRC_RFC_DIR)/%.d
+	$(CC) $(CFLAGS) -fPIC -c -o $@ $< -lm
+
 # Build target for static library
-_static: $(STATIC_LIB)
-static: _static clean_o
+static: $(STATIC_LIB)
+static-c: static clean-o clean-d
 
 # Rule to create the static library from src/rfc files
 $(STATIC_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	ar rcs $@ $(RFC_OBJ_FILES)
 
 # Build target for shared library
-_shared: $(SHARED_LIB)
-shared : _shared clean_o
+shared: $(SHARED_LIB)
+shared-c : shared clean-o clean-d
 
 # Rule to create the shared library from src/rfc files
 $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	$(CC) -shared -o $@ $(RFC_OBJ_FILES)
 
-# Rule to compile each .c file in src/rfc into position-independent code (.o files)
-$(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c
-	$(CC) $(CFLAGS) -fPIC -c -o $@ $< -lm
+
+# --------------------------------- test file rules ---------------------------------
 
 # Build target for test files
-_test: $(TEST_BIN_FILES)
-tests : _test clean_o
+tests: $(TEST_BIN_FILES)
+tests-c : test clean-o clean-d
 
 # Rule to compile each .c file in test into its corresponding binary
-$(TEST_DIR)/build/%: $(TEST_DIR)/%.c |  $(TEST_DIR)/build $(STATIC_LIB)
+$(TEST_DIR)/build/%: $(TEST_DIR)/%.c $(TEST_DIR)/%.d |  $(TEST_DIR)/build $(STATIC_LIB)
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lcMDA -lm
+
+
+# --------------------------------- mkdir rules ---------------------------------
 
 # Create the bin, lib, and test directories if they don't exist
 $(BIN_DIR) $(LIB_DIR) $(TEST_DIR)/build:
@@ -114,32 +145,110 @@ else
 	mkdir -p $(BIN_DIR) $(LIB_DIR) $(TEST_DIR)/build
 endif
 
-# Install the files
-install: _static _shared _build clean_o
+
+# --------------------------------- install rules ---------------------------------
+
+_install-static: static
+	@echo ""
+	@echo "-------------------installing static------------------------"
 ifeq ($(OS),Windows_NT)
 ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
 	mkdir -p $(INSTALL_DIR)
 else
 	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	
+	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib)
 endif
 else
-	mkdir -p $(INSTALL_DIR)
+	mkdir -p $(LIN_LIB_DIR)
+	install -m 644 lib/* $(LIN_LIB_DIR)
 endif
+	@echo ""
+install-static: _install-static clean-static  clean-o clean-d
 
+
+_install-shared: shared
+	@echo ""
+	@echo "-------------------installing shared------------------------"
+ifeq ($(OS),Windows_NT)
+ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+	mkdir -p $(INSTALL_DIR)
+else
+	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	
 	$(CP) lib $(subst /,$(SEP),$(INSTALL_DIR)/lib)
+endif
+else
+	mkdir -p $(LIN_LIB_DIR)
+	install -m 644 lib/* $(LIN_LIB_DIR)
+endif
+	@echo ""
+install-shared: _install-shared clean-shared  clean-o clean-d
+
+
+install-headers:
+	@echo ""
+	@echo "-------------------installing headers------------------------"
+ifeq ($(OS),Windows_NT)
+ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+	mkdir -p $(INSTALL_DIR)
+else
+	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	
 	$(CP) include $(subst /,$(SEP),$(INSTALL_DIR)/include)
+endif
+else
+	mkdir -p $(LIN_INC_DIR)
+	install -m 644 include/cMDA/* $(LIN_INC_DIR)
+endif
+	@echo ""
+
+
+_install-bin: build
+	@echo ""
+	@echo "-------------------installing bin------------------------"
+ifeq ($(OS),Windows_NT)
+ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+	mkdir -p $(INSTALL_DIR)
+else
+	if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	
 	$(CP) bin $(subst /,$(SEP),$(INSTALL_DIR)/bin)
+endif
+else
+	mkdir -p $(LIN_BIN_DIR)
+	install -m 755 bin/* $(LIN_BIN_DIR)
+endif
+	@echo ""
+install-bin: _install-bin clean-bin  clean-o clean-d
+
+
+# Install the files
+install: _install-static _install-shared install-headers _install-bin clean
+
+
+# --------------------------------- clean rules ---------------------------------
 
 # Clean target to remove compiled binaries and libraries
-clean_bin:
+clean-bin:
 	$(RM) $(subst /,$(SEP),$(BIN_DIR)/*)
 
-clean_tests:
+clean-tests:
 	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build/*)
 
-clean_o:
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
+clean-o:
+	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_MD_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
 
-clean: clean_bin clean_tests clean_o
+clean-d:
+	$(RM) $(subst /,$(SEP),$(DEP_FILES))
 
-.PHONY: all shared build static test clean clean_o
+clean-static:
+	$(RM) $(subst /,$(SEP),$(STATIC_LIB))
+
+clean-shared:
+	$(RM) $(subst /,$(SEP),$(SHARED_LIB))
+
+clean: clean-bin clean-tests clean-o clean-static clean-shared clean-d
+
+
+.PHONY: all shared build static tests clean

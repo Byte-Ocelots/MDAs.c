@@ -1,82 +1,102 @@
-name: Release on Tag
-
+name: Build and Release
+ 
 on:
   push:
     tags:
-      - "v*" # Trigger on tags starting with 'v'
-
+      - 'v*.*.*'  # Trigger on release tags like v1.0.0
+ 
 jobs:
-  build-and-release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            env_name: cMDA_linux64
-            compress_cmd: "tar -czf"
-            compress_ext: ".tar.gz"
-          - os: windows-latest
-            env_name: cMDA_win64
-            compress_cmd: "Compress-Archive -Path"
-            compress_ext: ".zip"
-
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+ 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    - name: Set Up Build Environment
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y make gcc
-
-    - name: Set Up Build Environment (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install make
-        choco install mingw
-
-    - name: Build Project
-      run: make all
-
-    - name: Prepare Artifact for Release
-      run: |
-        mkdir ${{ matrix.env_name }}
-        cp -r lib include bin ${{ matrix.env_name }}
-        ${{ matrix.compress_cmd }} ${{ matrix.env_name }} ${{ matrix.env_name }}${{ matrix.compress_ext }}
-      shell: bash
-
-    - name: Upload Release Asset
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.env_name }}
-        path: ${{ matrix.env_name }}${{ matrix.compress_ext }}
-
-  create-release:
-    needs: build-and-release
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      # Set up dependencies for Windows
+      - name: Set up dependencies
+        run: |
+          choco install make -y
+          choco install zip -y
+ 
+      # Run make all
+      - name: Build project
+        run: |
+          make all
+ 
+      # Compress lib, bin, and include into a zip file
+      - name: Package files
+        run: |
+          mkdir package
+          cp -r lib bin include package
+          zip -r cMDA_win64.zip package
+        shell: bash
+ 
+      # Upload the Windows ZIP file for release
+      - name: Upload Windows asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cMDA_win64.zip
+          asset_name: cMDA_win64.zip
+          asset_content_type: application/zip
+ 
+  build-linux:
+    name: Build on Linux
     runs-on: ubuntu-latest
+ 
     steps:
-    - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
-        body: |
-          This release includes:
-          - Prebuilt binaries for Windows and Linux.
-          - Library and headers for integration.
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: ${{ matrix.env_name }}${{ matrix.compress_ext }}
-        asset_name: ${{ matrix.env_name }}${{ matrix.compress_ext }}
-        asset_content_type: application/octet-stream
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      # Set up dependencies for Linux
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential tar
+ 
+      # Run make all
+      - name: Build project
+        run: |
+          make all
+ 
+      # Compress lib, bin, and include into a zip file
+      - name: Package files
+        run: |
+          mkdir package
+          cp -r lib bin include package
+          tar -czf cMDA_linux64.tar.gz -C package .
+ 
+      # Upload the Linux ZIP file for release
+      - name: Upload Linux asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cMDA_linux64.zip
+          asset_name: cMDA_linux64.zip
+          asset_content_type: application/zip
+ 
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+ 
+    outputs:
+      upload_url: ${{ steps.create.outputs.upload_url }}
+ 
+    steps:
+      - name: Create a Release
+        id: create
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            ## What's New
+            - Add your release notes here.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

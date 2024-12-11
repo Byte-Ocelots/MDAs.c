@@ -1,4 +1,8 @@
-int main()
+#include "cMDA/md4.h"
+#include "utils.h"
+
+/* Main function */
+int main(int argc, char **argv)
 {
-	return 0;
+	return man(argc, argv, cMD4);
 }

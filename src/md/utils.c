@@ -52,13 +52,13 @@ void printHash(uint8_t *data, uint8_t data_len, const char *format)
 }
 
 /* Function to compute and print the MD2 hash for a given string */
-void computeAndPrintMD2(const char *input, const char *format, const char *holder, uint8_t *(*cMD)(uint8_t *, uint64_t, uint8_t *))
+void computeAndPrintMD2(uint8_t *message, uint64_t message_len, const char *format, const char *holder, uint8_t *(*cMD)(uint8_t *, uint64_t, uint8_t *))
 {
-	uint8_t md2_digest[MD_DIGEST_LENGTH]; /* MD_DIGEST_LENGTH */
-	cMD((uint8_t *)input, strlen(input), md2_digest);
+	uint8_t md_digest[MD_DIGEST_LENGTH]; /* MD_DIGEST_LENGTH */
+	cMD(message, message_len, md_digest);
 
 	printf("%s -> ", holder);
-	printHash(md2_digest, MD_DIGEST_LENGTH, format);
+	printHash(md_digest, MD_DIGEST_LENGTH, format);
 	printf("\n");
 }
 
@@ -68,7 +68,7 @@ void processFile(const char *filename, const char *format, uint8_t *(*cMD)(uint8
 	FILE *file;
 	uint8_t buffer[1024];
 	size_t bytes_read;
-	/* MD2 requires the entire input at once to compute the hash */
+	/* MD2 requires the entire message at once to compute the hash */
 	/* Use a dynamic array to collect all the bytes */
 	size_t total_size = 0;
 	size_t capacity = 1024; /* Initial capacity */
@@ -113,7 +113,7 @@ void processFile(const char *filename, const char *format, uint8_t *(*cMD)(uint8
 	fclose(file);
 
 	/* Compute and Print the hash */
-	computeAndPrintMD2((char *)file_data, format, filename, cMD);
+	computeAndPrintMD2(file_data, total_size, format, filename, cMD);
 
 	/* Free allocated memory */
 	free(file_data);
@@ -128,10 +128,10 @@ int man(int argc, char **argv, uint8_t *(*cMD)(uint8_t *, uint64_t, uint8_t *))
 
 	if (argc < 2)
 	{
-		printf("Usage: %s [options] <input>\n", argv[0]);
+		printf("Usage: %s [options] <message>\n", argv[0]);
 		printf("Options:\n");
 		printf("  --help, -h        Show this help message.\n");
-		printf("  --file, -f FILE   Specify file input (multiple files allowed).\n");
+		printf("  --file, -f FILE   Specify file message (multiple files allowed).\n");
 		printf("  --format FORMAT   Specify output format: lower, upper, base64 (default: lower).\n");
 		return 0;
 	}
@@ -140,10 +140,10 @@ int man(int argc, char **argv, uint8_t *(*cMD)(uint8_t *, uint64_t, uint8_t *))
 	{
 		if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
 		{
-			printf("Usage: %s [options] <input>\n", argv[0]);
+			printf("Usage: %s [options] <message>\n", argv[0]);
 			printf("Options:\n");
 			printf("  --help, -h        Show this help message.\n");
-			printf("  --file, -f FILE   Specify file input (multiple files allowed).\n");
+			printf("  --file, -f FILE   Specify file message (multiple files allowed).\n");
 			printf("  --format FORMAT   Specify output format: lower, upper, base64 (default: lower).\n");
 			return 0;
 		}
@@ -179,7 +179,7 @@ int man(int argc, char **argv, uint8_t *(*cMD)(uint8_t *, uint64_t, uint8_t *))
 		}
 		else
 		{
-			computeAndPrintMD2(argv[i], format, argv[i], cMD);
+			computeAndPrintMD2((uint8_t *)argv[i], strlen(argv[i]), format, argv[i], cMD);
 		}
 	}
 

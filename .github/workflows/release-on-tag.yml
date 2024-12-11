@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*.*.*'  # Trigger on release tags like v1.0.0
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   create-release:
     name: Create GitHub Release
@@ -16,7 +20,7 @@ jobs:
     steps:
       - name: Create a Release
         id: create
-        uses: actions/create-release@v1
+        uses: actions/create-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}

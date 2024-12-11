@@ -23,16 +23,17 @@ jobs:
  
       # Run make all
       - name: Build project
+        shell: cmd
         run: |
           make all
  
       # Compress lib, bin, and include into a zip file
       - name: Package files
+        shell: cmd
         run: |
           mkdir package
           cp -r lib bin include package
           zip -r cMDA_win64.zip package
-        shell: bash
  
       # Upload the Windows ZIP file for release
       - name: Upload Windows asset

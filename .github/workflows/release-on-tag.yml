@@ -60,7 +60,8 @@ jobs:
         run: |
           mkdir package
           cp -r lib bin include package
-          zip -r cMDA_win64.zip package/*
+          cd package
+          zip -r ../cMDA_win64.zip *
 
       # Upload the Windows ZIP file for release
       - name: Upload Windows asset

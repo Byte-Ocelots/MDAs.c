@@ -14,7 +14,7 @@ ifeq ($(OS),Windows_NT)
         RM = rm -f
         CP = cp
         MV = mv
-        SEP = / 
+        SEP = /
     else
         RM = del /Q /F
         CP = xcopy /Y /E /I

@@ -21,16 +21,25 @@ ifeq ($(OS),Windows_NT)
         SEP = \\
     endif
 else
-	PREFIX ?= /usr/local
-	LIN_BIN_DIR = $(PREFIX)/bin
-	LIN_LIB_DIR = $(PREFIX)/lib
-	LIN_INC_DIR = $(PREFIX)/include/cMDA
-    RM = rm -f
-    CP = cp
-    MV = mv
-    SEP = /
-    SHARED_F = cMDA.so
+	RM = rm -f
+	CP = cp
+	MV = mv
+	SEP = /
+	ifeq ($(shell uname), Darwin)
+		# macOS-specific settings
+		SHARED_F = cMDA.dylib
+		INSTALL_DIR = /usr/local/Byte-Ocelots
+	else
+		# Linux or other Unix-based OS
+		PREFIX ?= /usr/local
+		LIN_BIN_DIR = $(PREFIX)/bin
+		LIN_LIB_DIR = $(PREFIX)/lib
+		LIN_INC_DIR = $(PREFIX)/include/cMDA
+		SHARED_F = cMDA.so
+	endif
 endif
+
+
 
 # Default target
 all: static shared build tests
@@ -65,7 +74,7 @@ STATIC_LIB = $(LIB_DIR)/libcMDA.a
 SHARED_LIB = $(LIB_DIR)/$(SHARED_F)
 
 # DEP FILES
-DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/md*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
+DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
 
 # Include the generated dependency files
 -include $(DEP_FILES)
@@ -82,16 +91,19 @@ $(SRC_RFC_DIR)/%.d: $(SRC_RFC_DIR)/%.c
 $(TEST_DIR)/%.d: $(TEST_DIR)/%.c
 	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
 
+
+# --------------------------------- build rules ---------------------------------
+
 # Build target for src/md files
-build: $(MD_BIN_FILES)
+build: static $(MD_BIN_FILES)
 build-c: build clean-o clean-d
 
 # Rule to compile each .c file into its corresponding .o object file
 $(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c $(SRC_MD_DIR)/%.d
-	$(CC) $(CFLAGS) -c $< -o $@ -lm
+	$(CC) $(CFLAGS) -c -o $@ $< -lm
 
 # Rule to compile each .c file in src/md into its corresponding binary
-$(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(MD_OTHER_OBJ_FILES) | $(BIN_DIR) $(STATIC_LIB)
+$(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(MD_OTHER_OBJ_FILES) | $(BIN_DIR)
 	$(CC) $(CFLAGS) -L$(LIB_DIR) -o $@ $^ -lcMDA -lm
 
 
@@ -121,11 +133,11 @@ $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 # --------------------------------- test file rules ---------------------------------
 
 # Build target for test files
-tests: $(TEST_BIN_FILES)
-tests-c : test clean-o clean-d
+tests: static $(TEST_BIN_FILES)
+tests-c : tests clean-o clean-d
 
 # Rule to compile each .c file in test into its corresponding binary
-$(TEST_DIR)/build/%: $(TEST_DIR)/%.c $(TEST_DIR)/%.d |  $(TEST_DIR)/build $(STATIC_LIB)
+$(TEST_DIR)/build/%: $(TEST_DIR)/%.c $(TEST_DIR)/%.d | $(TEST_DIR)/build
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB_DIR) -lcMDA -lm
 
 
@@ -252,3 +264,8 @@ clean: clean-bin clean-tests clean-o clean-static clean-shared clean-d
 
 
 .PHONY: all shared build static tests clean
+.SECONDARY: $(MD_MD_OBJ_FILES) $(MD_OTHER_OBJ_FILES) $(RFC_OBJ_FILES) $(STATIC_LIB) $(SHARED_LIB)
+.NOTPARALLEL: static shared
+.WAIT: static
+.IGNORE: clean
+.LOW_RESOLUTION_TIME:

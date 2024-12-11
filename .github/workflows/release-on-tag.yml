@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      upload_url: ${{ steps.create.outputs.upload_url }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
       - name: Create a Release
-        id: create
+        id: create_release
         uses: actions/create-release@v1
         with:
           tag_name: ${{ github.ref_name }}
@@ -65,8 +65,10 @@ jobs:
       # Upload the Windows ZIP file for release
       - name: Upload Windows asset
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ./cMDA_win64.zip
           asset_name: cMDA_win64.zip
           asset_content_type: application/zip
@@ -102,8 +104,10 @@ jobs:
       # Upload the Linux TAR file for release
       - name: Upload Linux asset
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ./cMDA_linux64.tar.gz
           asset_name: cMDA_linux64.tar.gz
           asset_content_type: application/gzip

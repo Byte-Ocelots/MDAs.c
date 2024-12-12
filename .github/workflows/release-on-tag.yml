@@ -52,7 +52,8 @@ jobs:
         shell: cmd
         run: |
           C:\\tools\\msys64\\usr\bin\\bash.exe --login -c "pacman -Syu --noconfirm"
-          C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
+          C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-crt-git mingw-w64-x86_64-libm mingw-w64-x86_64-glibc --noconfirm"
+          C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-i686-gcc mingw-w64-i686-crt-git mingw-w64-i686-libm mingw-w64-i686-glibc --noconfirm"
 
       # Run make all
       - name: Build project (x64)

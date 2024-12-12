@@ -281,7 +281,7 @@ clean-tests:
 	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build/*)
 
 clean-o:
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_MD_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
+	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_MD_OBJ_FILES)) $(subst /,$(SEP),$(MD_OTHER_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
 
 clean-d:
 	$(RM) $(subst /,$(SEP),$(DEP_FILES))

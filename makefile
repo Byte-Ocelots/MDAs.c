@@ -77,7 +77,7 @@ SHARED_LIB = $(LIB_DIR)/$(SHARED_FILE)
 DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
 
 # Include the generated dependency files
--include $(DEP_FILES)
+#-include $(DEP_FILES)
 
 # Rule to generate .d files for src/md/*.c
 $(SRC_MD_DIR)/%.d: $(SRC_MD_DIR)/%.c
@@ -95,7 +95,7 @@ $(TEST_DIR)/%.d: $(TEST_DIR)/%.c
 # --------------------------------- build rules ---------------------------------
 
 # Build target for src/md files
-build: static $(MD_BIN_FILES)
+build: static $(DEP_FILES) $(MD_BIN_FILES)
 build-c: build clean-o clean-d
 
 # Rule to compile each .c file into its corresponding .o object file
@@ -114,7 +114,7 @@ $(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c $(SRC_RFC_DIR)/%.d
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $< -lm
 
 # Build target for static library
-static: $(STATIC_LIB)
+static: $(DEP_FILES) $(STATIC_LIB)
 static-c: static clean-o clean-d
 
 # Rule to create the static library from src/rfc files
@@ -122,7 +122,7 @@ $(STATIC_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
 	ar rcs $@ $(RFC_OBJ_FILES)
 
 # Build target for shared library
-shared: $(SHARED_LIB)
+shared: $(DEP_FILES) $(SHARED_LIB)
 shared-c : shared clean-o clean-d
 
 # Rule to create the shared library from src/rfc files

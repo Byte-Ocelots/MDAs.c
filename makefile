@@ -7,8 +7,8 @@ $(info Current shell is: $(shell echo $$SHELL))
 
 # Define RM, MV, and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
-    SHARED_F = cMDA.dll
-    INSTALL_DIR = $(shell echo %windir:~0,2%)\\Byte-Ocelots
+    SHARED_FILE = cMDA.dll
+    INSTALL_DIR = $(shell echo %windir:~0,2%)/Byte-Ocelots
     ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
         RM = rm -f
         CP = cp
@@ -27,7 +27,7 @@ else
 	SEP = /
 	ifeq ($(shell uname), Darwin)
 		# macOS-specific settings
-		SHARED_F = cMDA.dylib
+		SHARED_FILE = cMDA.dylib
 		INSTALL_DIR = /usr/local/Byte-Ocelots
 	else
 		# Linux or other Unix-based OS
@@ -35,7 +35,7 @@ else
 		LIN_BIN_DIR = $(PREFIX)/bin
 		LIN_LIB_DIR = $(PREFIX)/lib
 		LIN_INC_DIR = $(PREFIX)/include/cMDA
-		SHARED_F = cMDA.so
+		SHARED_FILE = cMDA.so
 	endif
 endif
 
@@ -71,7 +71,7 @@ TEST_BIN_FILES = $(patsubst $(TEST_DIR)/%.c,$(TEST_DIR)/build/%,$(TEST_FILES))
 
 # Define the static library
 STATIC_LIB = $(LIB_DIR)/libcMDA.a
-SHARED_LIB = $(LIB_DIR)/$(SHARED_F)
+SHARED_LIB = $(LIB_DIR)/$(SHARED_FILE)
 
 # DEP FILES
 DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
@@ -99,7 +99,7 @@ build: static $(MD_BIN_FILES)
 build-c: build clean-o clean-d
 
 # Rule to compile each .c file into its corresponding .o object file
-$(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c $(SRC_MD_DIR)/%.d
+$(SRC_MD_DIR)/%.o: $(SRC_MD_DIR)/%.c $(STATIC_LIB) $(SRC_MD_DIR)/%.d
 	$(CC) $(CFLAGS) -c -o $@ $< -lm
 
 # Rule to compile each .c file in src/md into its corresponding binary
@@ -237,6 +237,38 @@ install-bin: _install-bin clean-bin  clean-o clean-d
 
 # Install the files
 install: _install-static _install-shared install-headers _install-bin clean
+	@echo ''
+	@echo "Install complete."
+
+
+# --------------------------------- uninstall rules ---------------------------------
+
+uninstall:
+	@echo ''
+	@echo "-------------------uninstalling------------------------"
+ifeq ($(OS),Windows_NT)
+ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+# For bash on Windows (e.g., Git Bash)
+	rm -f $(subst /,$(SEP),$(INSTALL_DIR)/bin/md*)
+	rm -f $(subst /,\,$(INSTALL_DIR)/$(STATIC_LIB))
+	rm -f $(subst /,\,$(INSTALL_DIR)/$(SHARED_LIB))
+	rm -rf $(subst /,$(SEP),$(INSTALL_DIR)/include/cMDA)
+else
+# For cmd.exe on Windows
+	if exist $(subst /,\,$(INSTALL_DIR)/bin/md*) del /q $(subst /,\,$(INSTALL_DIR)/bin/md*)
+	@if exist $(subst /,\,$(INSTALL_DIR)/${STATIC_LIB}) del /q $(subst /,\,$(INSTALL_DIR)/$(STATIC_LIB))
+	@if exist $(subst /,\,$(INSTALL_DIR)/${SHARED_LIB}) del /q $(subst /,\,$(INSTALL_DIR)/$(SHARED_LIB))
+	if exist $(subst /,\,$(INSTALL_DIR)/include/cMDA) rmdir /s /q $(subst /,\,$(INSTALL_DIR)/include/cMDA)
+endif
+else
+# Unix-based systems
+	rm -f $(LIN_BIN_DIR)/*
+	rm -f $(LIN_LIB_DIR)/libcMDA.a
+	rm -f $(LIN_LIB_DIR)/$(SHARED_FILE)
+	rm -rf $(LIN_INC_DIR)
+endif
+	@echo ''
+	@echo "Uninstall complete."
 
 
 # --------------------------------- clean rules ---------------------------------

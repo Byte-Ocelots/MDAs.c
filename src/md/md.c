@@ -3,6 +3,7 @@
 
 int main()
 {
-	printf("%zu\n", sizeof(size_t));
+	printf("%zu\n", sizeof(unsigned));
+	printf("%zu\n", sizeof(unsigned int));
 	return 0;
 }

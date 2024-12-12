@@ -2,8 +2,6 @@
 #define _FUNCS_MD_RFC
 
 
-unsigned long htobe64(unsigned long host_64bits);
-
 unsigned F(unsigned X, unsigned Y, unsigned Z);
 
 unsigned G4(unsigned X, unsigned Y, unsigned Z);

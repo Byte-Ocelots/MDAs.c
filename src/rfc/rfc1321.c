@@ -3,7 +3,7 @@
 #include "funcs.h"
 #include <math.h>
 
-void _a5(unsigned *a, unsigned b, unsigned c, unsigned d, unsigned char k, unsigned char s, unsigned i, unsigned (*OP)(unsigned, unsigned, unsigned), unsigned *X)
+void _a5(unsigned int *a, unsigned int b, unsigned int c, unsigned int d, unsigned char k, unsigned char s, unsigned int i, unsigned int (*OP)(unsigned int, unsigned int, unsigned int), unsigned int *X)
 {
 	(*a) = b + ROTL(((*a) + OP(b, c, d) + X[k] + (fabs(sin(i)) * pow(2, 32))), s);
 }
@@ -11,13 +11,13 @@ void _a5(unsigned *a, unsigned b, unsigned c, unsigned d, unsigned char k, unsig
 unsigned char *cMD5(unsigned char *message, unsigned long message_len, unsigned char *digest)
 {
 	unsigned long i;
-	unsigned ABCD[4];
+	unsigned int ABCD[4];
 	unsigned char j;
 
 	unsigned char *M = NULL;
-	unsigned A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; /* Step 3. Initialize MD Buffer */
-	unsigned AA, BB, CC, DD;
-	unsigned X[16];
+	unsigned int A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; /* Step 3. Initialize MD Buffer */
+	unsigned int AA, BB, CC, DD;
+	unsigned int X[16];
 	unsigned long b = message_len * 8;
 	unsigned long shy_bits = b % 512;
 	unsigned long remaining_bits;
@@ -50,10 +50,10 @@ unsigned char *cMD5(unsigned char *message, unsigned long message_len, unsigned 
 	{
 		for (j = 0; j <= 15; j++)
 		{
-			X[j] = (unsigned)M[i * 64 + j * 4] |
-				   ((unsigned)M[i * 64 + j * 4 + 1] << 8) |
-				   ((unsigned)M[i * 64 + j * 4 + 2] << 16) |
-				   ((unsigned)M[i * 64 + j * 4 + 3] << 24);
+			X[j] = (unsigned int)M[i * 64 + j * 4] |
+				   ((unsigned int)M[i * 64 + j * 4 + 1] << 8) |
+				   ((unsigned int)M[i * 64 + j * 4 + 2] << 16) |
+				   ((unsigned int)M[i * 64 + j * 4 + 3] << 24);
 		}
 
 		AA = A;

@@ -1,28 +1,29 @@
+#include "common.h"
 #include "cMDA/md4.h"
 #include "funcs.h"
 
-void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X, uint32_t z)
+void _a4(unsigned *a, unsigned b, unsigned c, unsigned d, unsigned char k, unsigned char s, unsigned (*OP)(unsigned, unsigned, unsigned), unsigned *X, unsigned z)
 {
 	(*a) = ROTL(((*a) + OP(b, c, d) + X[k] + z), s);
 }
 
-uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
+unsigned char *cMD4(unsigned char *message, unsigned long message_len, unsigned char *digest)
 {
-	uint64_t i;
-	uint32_t ABCD[4];
-	uint8_t j;
+	unsigned long i;
+	unsigned ABCD[4];
+	unsigned char j;
 
-	uint8_t *M = NULL;
-	uint32_t A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; /* Step 3. Initialize MD Buffer */
-	uint32_t AA, BB, CC, DD;
-	uint32_t X[16];
-	uint32_t zs[3] = {0x0,
+	unsigned char *M = NULL;
+	unsigned A = 0x67452301, B = 0xefcdab89, C = 0x98badcfe, D = 0x10325476; /* Step 3. Initialize MD Buffer */
+	unsigned AA, BB, CC, DD;
+	unsigned X[16];
+	unsigned zs[3] = {0x0,
 					  0x5A827999,
 					  0x6ED9EBA1};
-	uint64_t b = message_len * 8;
-	uint64_t shy_bits = b % 512;
-	uint64_t remaining_bits;
-	uint64_t N;
+	unsigned long b = message_len * 8;
+	unsigned long shy_bits = b % 512;
+	unsigned long remaining_bits;
+	unsigned long N;
 
 	/* Step 1. Append Padding Bits */
 	if (shy_bits < 448)
@@ -35,7 +36,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	}
 
 	N = (b + remaining_bits + 64) / 8;
-	M = (uint8_t *)malloc(N);
+	M = (unsigned char *)malloc(N);
 	memset(M, 0, N);
 	memcpy(M, message, message_len);
 	memset(M + message_len, 0, remaining_bits / 8);
@@ -44,7 +45,7 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	/* Step 2. Append Length */
 	for (i = 0; i < 8; i++)
 	{
-		M[N - 8 + i] = (uint8_t)(b >> i * 8) & 0xFF;
+		M[N - 8 + i] = (unsigned char)(b >> i * 8) & 0xFF;
 	}
 
 	/* Step 4. Process Message in 16-Word Blocks */
@@ -52,10 +53,10 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	{
 		for (j = 0; j <= 15; j++)
 		{
-			X[j] = (uint32_t)M[i * 64 + j * 4] |
-				   ((uint32_t)M[i * 64 + j * 4 + 1] << 8) |
-				   ((uint32_t)M[i * 64 + j * 4 + 2] << 16) |
-				   ((uint32_t)M[i * 64 + j * 4 + 3] << 24);
+			X[j] = (unsigned)M[i * 64 + j * 4] |
+				   ((unsigned)M[i * 64 + j * 4 + 1] << 8) |
+				   ((unsigned)M[i * 64 + j * 4 + 2] << 16) |
+				   ((unsigned)M[i * 64 + j * 4 + 3] << 24);
 		}
 
 		AA = A;
@@ -140,10 +141,10 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 
 	for (i = 0; i < 4; ++i)
 	{
-		digest[i * 4] = (uint8_t)(ABCD[i] & 0xFF);
-		digest[i * 4 + 1] = (uint8_t)((ABCD[i] >> 8) & 0xFF);
-		digest[i * 4 + 2] = (uint8_t)((ABCD[i] >> 16) & 0xFF);
-		digest[i * 4 + 3] = (uint8_t)((ABCD[i] >> 24) & 0xFF);
+		digest[i * 4] = (unsigned char)(ABCD[i] & 0xFF);
+		digest[i * 4 + 1] = (unsigned char)((ABCD[i] >> 8) & 0xFF);
+		digest[i * 4 + 2] = (unsigned char)((ABCD[i] >> 16) & 0xFF);
+		digest[i * 4 + 3] = (unsigned char)((ABCD[i] >> 24) & 0xFF);
 	}
 
 	return digest;

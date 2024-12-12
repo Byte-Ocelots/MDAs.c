@@ -3,5 +3,6 @@
 
 int main()
 {
+	printf("%zu\n", sizeof(size_t));
 	return 0;
 }

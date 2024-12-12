@@ -1,22 +1,21 @@
 #ifndef _FUNCS_MD_RFC
 #define _FUNCS_MD_RFC
 
-#include <stdint.h>
 
-uint64_t htobe64(uint64_t host_64bits);
+unsigned long htobe64(unsigned long host_64bits);
 
-uint32_t F(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned F(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t G4(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned G4(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t G5(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned G5(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t H(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned H(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t I(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned I(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t G_md5(uint32_t X, uint32_t Y, uint32_t Z);
+unsigned G_md5(unsigned X, unsigned Y, unsigned Z);
 
-uint32_t ROTL(uint32_t x, uint8_t n);
+unsigned ROTL(unsigned x, unsigned char n);
 
 #endif

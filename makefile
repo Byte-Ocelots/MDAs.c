@@ -1,14 +1,17 @@
 # Define the compiler and compiler flags
 CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra -std=c99
+_ARCH = -m64
 
 # Detect conflicting flags and ensure only one is set
 ifeq ($(arch), 32)
     CFLAGS += -m32
+    _ARCH = -m32
 endif
 
 ifeq ($(arch), 64)
     CFLAGS += -m64
+    _ARCH = -m64
 endif
 
 # Echo the current shell explicitly
@@ -136,7 +139,7 @@ shared-c : shared clean-o clean-d
 
 # Rule to create the shared library from src/rfc files
 $(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
-	$(CC) -shared -o $@ $(RFC_OBJ_FILES)
+	$(CC) -shared $(_ARCH) -o $@ $(RFC_OBJ_FILES)
 
 
 # --------------------------------- test file rules ---------------------------------

@@ -52,8 +52,7 @@ jobs:
       - name: Build project (x64)
         shell: cmd
         run: |
-          make clean
-          make all arch=64
+          make clean all arch=64
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x64)
@@ -70,8 +69,7 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          make clean
-          make all arch=32
+          make clean all arch=32
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x32)
@@ -126,8 +124,7 @@ jobs:
       # Run make all
       - name: Build project (x64)
         run: |
-          make clean
-          make all arch=64
+          make clean all arch=64
 
       # Compress lib, bin, and include into a tar file
       - name: Package files (x64)
@@ -140,8 +137,7 @@ jobs:
         # Run make all
       - name: Build project (x32)
         run: |
-          make clean
-          make all arch=32
+          make clean all arch=32
 
       # Compress lib, bin, and include into a tar file
       - name: Package files (x32)

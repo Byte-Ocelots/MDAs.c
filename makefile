@@ -1,6 +1,15 @@
 # Define the compiler and compiler flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -ansi -pedantic -std=c89
+CFLAGS = -Iinclude -Wall -Wextra -std=c89
+
+# Detect conflicting flags and ensure only one is set
+ifeq ($(arch), 32)
+    CFLAGS += -m32
+endif
+
+ifeq ($(arch), 64)
+    CFLAGS += -m64
+endif
 
 # Echo the current shell explicitly
 $(info Current shell is: $(shell echo $$SHELL))

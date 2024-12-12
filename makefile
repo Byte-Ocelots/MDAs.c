@@ -1,37 +1,38 @@
 # Define the compiler and compiler flags
-CC ?= gcc
+CC = gcc
 CFLAGS = -Iinclude -Wall -Wextra -std=c99
 _ARCH =
 
 # Detect conflicting flags and ensure only one is set
 ifeq ($(arch), 32)
-    CFLAGS += -m32
-    _ARCH = -m32
+	CFLAGS += -m32
+	_ARCH = -m32
 endif
 
 ifeq ($(arch), 64)
-    CFLAGS += -m64
-    _ARCH = -m64
+	CFLAGS += -m64
+	_ARCH = -m64
 endif
 
 # Echo the current shell explicitly
 $(info Current shell is: $(shell echo $$SHELL))
+$(info CC: $(CC))
 
 # Define RM, MV, and SEP command specific to platform
 ifeq ($(OS),Windows_NT)
-    SHARED_FILE = cMDA.dll
-    INSTALL_DIR = $(shell echo %windir:~0,2%)/Byte-Ocelots
-    ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
-        RM = rm -f
-        CP = cp
-        MV = mv
-        SEP = /
-    else
-        RM = del /Q /F
-        CP = xcopy /Y /E /I
-        MV = move
-        SEP = \\
-    endif
+	SHARED_FILE = cMDA.dll
+	INSTALL_DIR = $(shell echo %windir:~0,2%)/Byte-Ocelots
+	ifeq ($(findstring bash,$(shell echo $$SHELL)),bash)
+		RM = rm -f
+		CP = cp
+		MV = mv
+		SEP = /
+	else
+		RM = del /Q /F
+		CP = xcopy /Y /E /I
+		MV = move
+		SEP = \\
+	endif
 else
 	RM = rm -f
 	CP = cp

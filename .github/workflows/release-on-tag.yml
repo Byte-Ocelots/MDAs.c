@@ -51,8 +51,8 @@ jobs:
       - name: Set up mingw
         shell: cmd
         run: |
-          C:\\tools\\msys64\\usr\bin\\bash.exe -c "pacman -Syu --noconfirm"
-          C:\\tools\\msys64\\usr\\bin\\bash.exe -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
+          C:\\tools\\msys64\\usr\bin\\bash.exe --login -c "pacman -Syu --noconfirm"
+          C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
 
       # Run make all
       - name: Build project (x64)

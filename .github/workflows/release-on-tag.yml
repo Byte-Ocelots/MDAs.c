@@ -49,22 +49,43 @@ jobs:
           choco install zip -y
 
       # Run make all
-      - name: Build project
+      - name: Build project (x64)
         shell: cmd
         run: |
-          make all
+          make clean
+          make all arch=64
 
       # Compress lib, bin, and include into a zip file
-      - name: Package files
+      - name: Package files (x64)
         shell: cmd
         run: |
           mkdir package
           cp -r lib bin include package
           cd package
           zip -r ../cMDA_win64.zip *
+          cd ..
+          rmdir /s /q package
+
+      # Run make all
+      - name: Build project (x32)
+        shell: cmd
+        run: |
+          make clean
+          make all arch=32
+
+      # Compress lib, bin, and include into a zip file
+      - name: Package files (x32)
+        shell: cmd
+        run: |
+          mkdir package
+          cp -r lib bin include package
+          cd package
+          zip -r ../cMDA_win32.zip *
+          cd ..
+          rmdir /s /q package
 
       # Upload the Windows ZIP file for release
-      - name: Upload Windows asset
+      - name: Upload Windows x64 asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,6 +93,17 @@ jobs:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./cMDA_win64.zip
           asset_name: cMDA_win64.zip
+          asset_content_type: application/zip
+
+      # Upload the Windows ZIP file for release
+      - name: Upload Windows x64 asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./cMDA_win32.zip
+          asset_name: cMDA_win32.zip
           asset_content_type: application/zip
 
   build-linux:
@@ -87,23 +119,40 @@ jobs:
       # Set up dependencies for Linux
       - name: Install dependencies
         run: |
+          sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y build-essential tar
+          sudo apt-get install -y build-essential tar libc6:i386 libc6-dev:i386 gcc-multilib g++-multilib
 
       # Run make all
-      - name: Build project
+      - name: Build project (x64)
         run: |
-          make all
+          make clean
+          make all arch=64
 
       # Compress lib, bin, and include into a tar file
-      - name: Package files
+      - name: Package files (x64)
         run: |
-          mkdir package
+          mkdir -p package
           cp -r lib bin include package
           tar -czf cMDA_linux64.tar.gz -C package .
+          rm -rf package
+
+        # Run make all
+      - name: Build project (x32)
+        run: |
+          make clean
+          make all arch=32
+
+      # Compress lib, bin, and include into a tar file
+      - name: Package files (x32)
+        run: |
+          mkdir -p package
+          cp -r lib bin include package
+          tar -czf cMDA_linux32.tar.gz -C package .
+          rm -rf package
 
       # Upload the Linux TAR file for release
-      - name: Upload Linux asset
+      - name: Upload Linux x64 asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,4 +160,16 @@ jobs:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ./cMDA_linux64.tar.gz
           asset_name: cMDA_linux64.tar.gz
+          asset_content_type: application/gzip
+
+
+      # Upload the Linux TAR file for release
+      - name: Upload Linux x32 asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./cMDA_linux32.tar.gz
+          asset_name: cMDA_linux32.tar.gz
           asset_content_type: application/gzip

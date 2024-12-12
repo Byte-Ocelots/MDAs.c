@@ -44,10 +44,11 @@ jobs:
 
       # Set up dependencies for Windows
       - name: Set up dependencies
+        shell: cmd
         run: |
           choco install make  msys2 zip -y
-          C:\tools\msys64\usr\bin\bash.exe -c "pacman -Syu --noconfirm"
-          C:\tools\msys64\usr\bin\bash.exe -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
+          C:\\tools\\msys64\\usr\bin\\bash.exe -c "pacman -Syu --noconfirm"
+          C:\\tools\\msys64\\usr\\bin\\bash.exe -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
 
       # Run make all
       - name: Build project (x64)

@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -std=c89
+CFLAGS = -Iinclude -Wall -Wextra -std=c99
 
 # Detect conflicting flags and ensure only one is set
 ifeq ($(arch), 32)

@@ -1,8 +1,10 @@
 #ifndef INC_cMD4
 #define INC_cMD4
 
+#include <stdint.h>
+
 #define MD4_DIGEST_LENGTH 16
 
-unsigned char *cMD4(unsigned char *message, unsigned long message_len, unsigned char *digest);
+uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest);
 
 #endif

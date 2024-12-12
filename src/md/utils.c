@@ -1,12 +1,12 @@
 #include "utils.h"
 
 /* Function to print a byte array in the selected format */
-void printHash(unsigned char *data, unsigned char data_len, const char *format)
+void printHash(uint8_t *data, uint8_t data_len, const char *format)
 {
 	static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	char base64_output[25]; /* Enough for 16 bytes of MD2 digest */
 	int j, bits, buffer;
-	unsigned char i;
+	uint8_t i;
 
 	if (strcmp(format, "upper") == 0)
 	{
@@ -52,9 +52,9 @@ void printHash(unsigned char *data, unsigned char data_len, const char *format)
 }
 
 /* Function to compute and print the MD2 hash for a given string */
-void computeAndPrintMD2(unsigned char *message,unsigned long message_len, const char *format, const char *holder, unsigned char *(*cMD)(unsigned char *,unsigned long, unsigned char *))
+void computeAndPrintMD2(uint8_t *message,uint64_t message_len, const char *format, const char *holder, uint8_t *(*cMD)(uint8_t *,uint64_t, uint8_t *))
 {
-	unsigned char md_digest[MD_DIGEST_LENGTH]; /* MD_DIGEST_LENGTH */
+	uint8_t md_digest[MD_DIGEST_LENGTH]; /* MD_DIGEST_LENGTH */
 	cMD(message, message_len, md_digest);
 
 	printf("%s -> ", holder);
@@ -63,17 +63,17 @@ void computeAndPrintMD2(unsigned char *message,unsigned long message_len, const 
 }
 
 /* Function to process a file line by line */
-void processFile(const char *filename, const char *format, unsigned char *(*cMD)(unsigned char *,unsigned long, unsigned char *))
+void processFile(const char *filename, const char *format, uint8_t *(*cMD)(uint8_t *,uint64_t, uint8_t *))
 {
 	FILE *file;
-	unsigned char buffer[1024];
+	uint8_t buffer[1024];
 	size_t bytes_read;
 	/* MD2 requires the entire message at once to compute the hash */
 	/* Use a dynamic array to collect all the bytes */
 	size_t total_size = 0;
 	size_t capacity = 1024; /* Initial capacity */
-	unsigned char *file_data = malloc(capacity);
-	unsigned char *new_data;
+	uint8_t *file_data = malloc(capacity);
+	uint8_t *new_data;
 
 	file = fopen(filename, "rb"); /* Open the file in binary mode */
 	if (!file)
@@ -95,7 +95,7 @@ void processFile(const char *filename, const char *format, unsigned char *(*cMD)
 		if (total_size + bytes_read > capacity)
 		{
 			capacity += total_size + bytes_read + 1;
-			new_data = (unsigned char *)realloc(file_data, capacity);
+			new_data = (uint8_t *)realloc(file_data, capacity);
 			if (!new_data)
 			{
 				fprintf(stderr, "Error: Memory reallocation failed.\n");
@@ -120,7 +120,7 @@ void processFile(const char *filename, const char *format, unsigned char *(*cMD)
 }
 
 
-int man(int argc, char **argv, unsigned char *(*cMD)(unsigned char *,unsigned long, unsigned char *))
+int man(int argc, char **argv, uint8_t *(*cMD)(uint8_t *,uint64_t, uint8_t *))
 {
 	const char *format = "lower";
 	int i;
@@ -179,7 +179,7 @@ int man(int argc, char **argv, unsigned char *(*cMD)(unsigned char *,unsigned lo
 		}
 		else
 		{
-			computeAndPrintMD2((unsigned char *)argv[i], strlen(argv[i]), format, argv[i], cMD);
+			computeAndPrintMD2((uint8_t *)argv[i], strlen(argv[i]), format, argv[i], cMD);
 		}
 	}
 

@@ -8,6 +8,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int man(int argc, char **argv, unsigned char *(*cMD)(unsigned char *, unsigned long, unsigned char *));
+int man(int argc, char **argv, uint8_t *(*cMD)(uint8_t *,uint64_t, uint8_t *));
 
 #endif

@@ -45,14 +45,18 @@ jobs:
       # Set up dependencies for Windows
       - name: Set up dependencies
         run: |
-          choco install make -y
+          choco install msys2
+          C:\tools\msys64\usr\bin\bash.exe -c "pacman -Syu --noconfirm"
+          C:\tools\msys64\usr\bin\bash.exe -c "pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain --noconfirm"
+    
           choco install zip -y
 
       # Run make all
       - name: Build project (x64)
         shell: cmd
         run: |
-          make clean all arch=64
+          echo "C:\\tools\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+          make clean CC=x86_64-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x64)
@@ -69,7 +73,8 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          make clean all arch=32
+          echo "C:\\tools\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+          make clean CC=i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x32)

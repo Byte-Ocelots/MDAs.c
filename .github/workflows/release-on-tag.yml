@@ -75,7 +75,7 @@ jobs:
       # Run make all
       - name: Build project (x32)
         run: |
-          echo %PATH%
+          echo $GITHUB_PATH
           where i686-w64-mingw32-gcc
           make clean CC=i686-w64-mingw32-gcc all
 

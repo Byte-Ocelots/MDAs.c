@@ -2,7 +2,7 @@
 
 ## Overview
 
-`cMDA` is a versatile cryptographic library for hashing operations. It supports MD2, MD4, MD5, and other hashing standards. The library includes:
+`cMDA` is a versatile cryptographic library for hashing operations. It supports MD2, MD4, and MD5 standards. The library includes:
 
 - A collection of headers for seamless integration into your applications.
 - Command-line utilities for hashing messages and files.
@@ -45,6 +45,37 @@ Include the desired header files in your application:
   #include <cMDA/md4.h>   // For MD4
   #include <cMDA/md5.h>   // For MD5
   ```
+
+### **Functions**
+
+Following are the available functions:
+```c
+uint8_t *cMD2(uint8_t *message, uint64_t message_len, uint8_t *digest);   // For MD2
+uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest);   // For MD4
+uint8_t *cMD5(uint8_t *message, uint64_t message_len, uint8_t *digest);   // For MD5
+```
+
+*example:*
+```c
+#include "cMDA/all.h"   // all cMDA functions
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char * message = "your message";
+    uint8_t md2_digest[MD2_DIGEST_LENGTH];
+    uint8_t md4_digest[MD4_DIGEST_LENGTH];
+    uint8_t md5_digest[MD5_DIGEST_LENGTH];
+
+    cMD2((uint8_t *)message, strlen(message), md2_digest);
+    cMD4((uint8_t *)message, strlen(message), md4_digest);
+    cMD5((uint8_t *)message, strlen(message), md5_digest);
+
+    return 0;
+}
+```
 
 ### **Compiling with cMDA**
 

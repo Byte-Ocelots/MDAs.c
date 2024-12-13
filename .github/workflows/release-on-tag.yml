@@ -60,6 +60,7 @@ jobs:
         shell: cmd
         run: |
           echo "C:\\tools\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+          where x86_64-w64-mingw32-gcc
           make clean CC=x86_64-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file

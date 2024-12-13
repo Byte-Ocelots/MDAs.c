@@ -60,6 +60,7 @@ jobs:
       - name: Build project (x64)
         shell: cmd
         run: |
+          set PATH=C:\tools\msys64\mingw64\bin;%PATH%
           make clean CC=x86_64-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
@@ -78,8 +79,6 @@ jobs:
         shell: cmd
         run: |
           set PATH=C:\tools\msys64\mingw32\bin;%PATH%
-          echo %PATH%
-          i686-w64-mingw32-gcc -v
           make clean CC=i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file

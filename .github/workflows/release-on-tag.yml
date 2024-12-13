@@ -77,7 +77,8 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          set PATH=C:\tools\msys64\mingw32\bin%PATH%
+          set PATH=C:\tools\msys64\mingw32\bin;%PATH%
+          echo %PATH%
           i686-w64-mingw32-gcc -v
           make clean CC=i686-w64-mingw32-gcc all
 

@@ -77,7 +77,10 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          echo "C:\\tools\\msys64\\mingw32\\bin" >> $GITHUB_PATH
+          setx PATH "C:\\tools\\msys64\\mingw32\\bin;%PATH%"
+          echo %PATH%
+          where i686-w64-mingw32-gcc
+          i686-w64-mingw32-gcc --version
           make clean CC=i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file

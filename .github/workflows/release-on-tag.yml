@@ -59,7 +59,7 @@ jobs:
       - name: Build project (x64)
         shell: cmd
         run: |
-          make clean CC=C:\tools\msys64\mingw64\bin\x86_64-w64-mingw32-gcc all
+          make clean CC=C:/tools/msys64/mingw64/bin/x86_64-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x64)
@@ -76,7 +76,7 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          make clean CC=C:\tools\msys64\mingw32\bin\i686-w64-mingw32-gcc all
+          make clean CC=C:/tools/msys64/mingw32/bin/i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
       - name: Package files (x32)

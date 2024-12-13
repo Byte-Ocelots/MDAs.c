@@ -77,8 +77,7 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          setx PATH "C:\\tools\\msys64\\mingw32\\bin;%PATH%"
-          echo %PATH%
+          echo "C:\\tools\\msys64\\mingw32\\bin" >> $GITHUB_PATH
           where i686-w64-mingw32-gcc
           i686-w64-mingw32-gcc --version
           make clean CC=i686-w64-mingw32-gcc all

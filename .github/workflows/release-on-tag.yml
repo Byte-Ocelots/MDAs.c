@@ -54,13 +54,13 @@ jobs:
           C:\\tools\\msys64\\usr\bin\\bash.exe --login -c "pacman -Syu --noconfirm"
           C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-crt-git --noconfirm"
           C:\\tools\\msys64\\usr\\bin\\bash.exe --login -c "pacman -S mingw-w64-i686-gcc mingw-w64-i686-crt-git --noconfirm"
+          setx PATH "%PATH%;C:\tools\msys64\mingw64\bin;C:\tools\msys64\mingw32\bin"
+          refreshenv
 
       # Run make all
       - name: Build project (x64)
         shell: cmd
         run: |
-          echo "C:\\tools\\msys64\\mingw64\\bin" >> $GITHUB_PATH
-          where x86_64-w64-mingw32-gcc
           make clean CC=x86_64-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file
@@ -78,10 +78,8 @@ jobs:
       - name: Build project (x32)
         shell: cmd
         run: |
-          echo "C:\\tools\\msys64\\mingw32\\bin" >> $GITHUB_PATH
-          tree "C:\\tools\\msys64" /f
+          echo %PATH%
           where i686-w64-mingw32-gcc
-          i686-w64-mingw32-gcc --version
           make clean CC=i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file

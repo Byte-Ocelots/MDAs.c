@@ -312,5 +312,5 @@ clean: clean-bin clean-tests clean-o clean-static clean-shared clean-d
 .SECONDARY: $(MD_MD_OBJ_FILES) $(MD_OTHER_OBJ_FILES) $(RFC_OBJ_FILES) $(STATIC_LIB) $(SHARED_LIB)
 .NOTPARALLEL: static shared
 .WAIT: static
-.IGNORE: clean
+.IGNORE: clean clean-static clean-shared clean-o clean-d clean-bin clean-tests
 .LOW_RESOLUTION_TIME:

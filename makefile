@@ -60,7 +60,7 @@ all-c: all clean-o clean-d
 
 # Define directories
 SRC_MD_DIR = src/md
-SRC_RFC_DIR = src/rfc
+SRC_CMDA_DIR = src/cmda
 TEST_DIR = tests
 BIN_DIR = bin
 LIB_DIR = lib
@@ -74,9 +74,9 @@ MD_OTHER_OBJ_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.o, $(SRC_MD_O
 
 MD_BIN_FILES = $(patsubst $(SRC_MD_DIR)/%.c,$(BIN_DIR)/%,$(SRC_MD_MD_FILES))
 
-# Find all .c files in the src/rfc directory
-SRC_RFC_FILES = $(wildcard $(SRC_RFC_DIR)/*.c)
-RFC_OBJ_FILES = $(patsubst $(SRC_RFC_DIR)/%.c,$(SRC_RFC_DIR)/%.o,$(SRC_RFC_FILES))
+# Find all .c files in the src/cmda directory
+SRC_CMDA_FILES = $(wildcard $(SRC_CMDA_DIR)/*.c)
+CMDA_OBJ_FILES = $(patsubst $(SRC_CMDA_DIR)/%.c,$(SRC_CMDA_DIR)/%.o,$(SRC_CMDA_FILES))
 
 # Find all .c files in the test directory
 TEST_FILES = $(wildcard $(TEST_DIR)/*.c)
@@ -87,7 +87,7 @@ STATIC_LIB = $(LIB_DIR)/libcMDA.a
 SHARED_LIB = $(LIB_DIR)/$(SHARED_FILE)
 
 # DEP FILES
-DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/*.c)) $(patsubst $(SRC_RFC_DIR)/%.c, $(SRC_RFC_DIR)/%.d, $(SRC_RFC_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
+DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD_DIR)/*.c)) $(patsubst $(SRC_CMDA_DIR)/%.c, $(SRC_CMDA_DIR)/%.d, $(SRC_CMDA_FILES)) $(patsubst $(TEST_DIR)/%.c, $(TEST_DIR)/%.d, $(TEST_FILES))
 
 # Include the generated dependency files
 #-include $(DEP_FILES)
@@ -96,8 +96,8 @@ DEP_FILES = $(patsubst $(SRC_MD_DIR)/%.c, $(SRC_MD_DIR)/%.d, $(wildcard $(SRC_MD
 $(SRC_MD_DIR)/%.d: $(SRC_MD_DIR)/%.c
 	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
 
-# Rule to generate .d files for src/rfc/*.c
-$(SRC_RFC_DIR)/%.d: $(SRC_RFC_DIR)/%.c
+# Rule to generate .d files for src/cmda/*.c
+$(SRC_CMDA_DIR)/%.d: $(SRC_CMDA_DIR)/%.c
 	$(CC) $(CFLAGS) -MM -MP -MF $@ $<
 
 # Rule to generate .d files for tests/*.c
@@ -122,25 +122,25 @@ $(BIN_DIR)/%: $(SRC_MD_DIR)/%.o $(MD_OTHER_OBJ_FILES) | $(BIN_DIR)
 
 # --------------------------------- shared and static lib rules ---------------------------------
 
-# Rule to compile each .c file in src/rfc into position-independent code (.o files)
-$(SRC_RFC_DIR)/%.o: $(SRC_RFC_DIR)/%.c $(SRC_RFC_DIR)/%.d
+# Rule to compile each .c file in src/cmda into position-independent code (.o files)
+$(SRC_CMDA_DIR)/%.o: $(SRC_CMDA_DIR)/%.c $(SRC_CMDA_DIR)/%.d
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $< -lm
 
 # Build target for static library
 static: $(DEP_FILES) $(STATIC_LIB)
 static-c: static clean-o clean-d
 
-# Rule to create the static library from src/rfc files
-$(STATIC_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
-	ar rcs $@ $(RFC_OBJ_FILES)
+# Rule to create the static library from src/cmda files
+$(STATIC_LIB): $(CMDA_OBJ_FILES) | $(LIB_DIR)
+	ar rcs $@ $(CMDA_OBJ_FILES)
 
 # Build target for shared library
 shared: $(DEP_FILES) $(SHARED_LIB)
 shared-c : shared clean-o clean-d
 
-# Rule to create the shared library from src/rfc files
-$(SHARED_LIB): $(RFC_OBJ_FILES) | $(LIB_DIR)
-	$(CC) -shared $(_ARCH) -o $@ $(RFC_OBJ_FILES)
+# Rule to create the shared library from src/cmda files
+$(SHARED_LIB): $(CMDA_OBJ_FILES) | $(LIB_DIR)
+	$(CC) -shared $(_ARCH) -o $@ $(CMDA_OBJ_FILES)
 
 
 # --------------------------------- test file rules ---------------------------------
@@ -294,7 +294,7 @@ clean-tests:
 	$(RM) $(subst /,$(SEP),$(TEST_DIR)/build/*)
 
 clean-o:
-	$(RM) $(subst /,$(SEP),$(RFC_OBJ_FILES)) $(subst /,$(SEP),$(MD_MD_OBJ_FILES)) $(subst /,$(SEP),$(MD_OTHER_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
+	$(RM) $(subst /,$(SEP),$(CMDA_OBJ_FILES)) $(subst /,$(SEP),$(MD_MD_OBJ_FILES)) $(subst /,$(SEP),$(MD_OTHER_OBJ_FILES)) $(subst /,$(SEP),$(TEST_OBJ_FILES))
 
 clean-d:
 	$(RM) $(subst /,$(SEP),$(DEP_FILES))
@@ -309,7 +309,7 @@ clean: clean-bin clean-tests clean-o clean-static clean-shared clean-d
 
 
 .PHONY: all shared build static tests clean
-.SECONDARY: $(MD_MD_OBJ_FILES) $(MD_OTHER_OBJ_FILES) $(RFC_OBJ_FILES) $(STATIC_LIB) $(SHARED_LIB)
+.SECONDARY: $(MD_MD_OBJ_FILES) $(MD_OTHER_OBJ_FILES) $(CMDA_OBJ_FILES) $(STATIC_LIB) $(SHARED_LIB)
 .NOTPARALLEL: static shared
 .WAIT: static
 .IGNORE: clean clean-static clean-shared clean-o clean-d clean-bin clean-tests

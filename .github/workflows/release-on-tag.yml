@@ -78,6 +78,7 @@ jobs:
         shell: cmd
         run: |
           echo "C:\\tools\\msys64\\mingw32\\bin" >> $GITHUB_PATH
+          tree "C:\\tools\\msys64" /f
           where i686-w64-mingw32-gcc
           i686-w64-mingw32-gcc --version
           make clean CC=i686-w64-mingw32-gcc all

@@ -75,6 +75,7 @@ jobs:
       - name: Build project (x32)
         shell: bash
         run: |
+          C:\\tools\\msys64\\mingw32\\bin\\i686-w64-mingw32-gcc -v
           make clean CC=C:\\tools\\msys64\\mingw32\\bin\\i686-w64-mingw32-gcc all
 
       # Compress lib, bin, and include into a zip file

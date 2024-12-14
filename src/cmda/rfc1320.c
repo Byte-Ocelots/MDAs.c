@@ -2,7 +2,7 @@
 #include "cMDA/md4.h"
 #include "funcs.h"
 
-void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X, uint32_t z)
+void _a4(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, cMDA_func_t OP, uint32_t *X, uint32_t z)
 {
 	(*a) = ROTL(((*a) + OP(b, c, d) + X[k] + z), s);
 }
@@ -47,6 +47,13 @@ uint8_t *cMD4(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	{
 		M[N - 8 + i] = (uint8_t)(b >> i * 8) & 0xFF;
 	}
+
+	/* amid */
+	if (__cMDA_CPU == EMPTY)
+	{
+		set_cpu_supported_op();
+	}
+	
 
 	/* Step 4. Process Message in 16-Word Blocks */
 	for (i = 0; i <= N / 64 - 1; i++)

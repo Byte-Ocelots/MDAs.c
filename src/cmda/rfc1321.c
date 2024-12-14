@@ -3,7 +3,7 @@
 #include "funcs.h"
 #include <math.h>
 
-void _a5(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t i, uint32_t (*OP)(uint32_t, uint32_t, uint32_t), uint32_t *X)
+void _a5(uint32_t *a, uint32_t b, uint32_t c, uint32_t d, uint8_t k, uint8_t s, uint32_t i, cMDA_func_t OP, uint32_t *X)
 {
 	(*a) = b + ROTL(((*a) + OP(b, c, d) + X[k] + (fabs(sin(i)) * pow(2, 32))), s);
 }
@@ -43,6 +43,12 @@ uint8_t *cMD5(uint8_t *message, uint64_t message_len, uint8_t *digest)
 	for (i = 0; i < 8; i++)
 	{
 		M[N - 8 + i] = (uint8_t)(b >> i * 8) & 0xFF;
+	}
+
+	/* amid */
+	if (__cMDA_CPU == EMPTY)
+	{
+		set_cpu_supported_op();
 	}
 
 	/* Step 4. Process Message in 16-Word Blocks */

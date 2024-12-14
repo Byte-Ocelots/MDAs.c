@@ -1,6 +1,6 @@
 # Define the compiler and compiler flags
 CC = gcc
-CFLAGS = -Iinclude -Wall -Wextra -std=c99
+CFLAGS = -Iinclude -Wall -Wextra -std=c99 -O2 -mavx -mavx2 -msse -msse2
 _ARCH =
 
 # Detect conflicting flags and ensure only one is set

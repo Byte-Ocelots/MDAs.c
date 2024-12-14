@@ -67,8 +67,10 @@ jobs:
       - name: Package files (x64)
         shell: cmd
         run: |
-          mkdir package
-          cp -r lib bin include package
+          mkdir -p package/bin/w64 package/lib/x86_64 package/include
+          cp -r bin/* package/bin/w64
+          cp -r include/* package/include
+          cp -r lib/* package/lib/x86_64
           cd package
           zip -r ../cMDA_win64.zip *
           cd ..
@@ -85,8 +87,10 @@ jobs:
       - name: Package files (x32)
         shell: cmd
         run: |
-          mkdir package
-          cp -r lib bin include package
+          mkdir -p package/bin/w32 package/lib/i686 package/include
+          cp -r bin/* package/bin/w32
+          cp -r include/* package/include
+          cp -r lib/* package/lib/i686
           cd package
           zip -r ../cMDA_win32.zip *
           cd ..

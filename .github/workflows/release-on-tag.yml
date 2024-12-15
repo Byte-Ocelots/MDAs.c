@@ -71,6 +71,7 @@ jobs:
           cp -r bin/* package/bin/w64
           cp -r include/* package/include
           cp -r lib/* package/lib/x86_64
+          cp install.bat package
           cd package
           zip -r ../cMDA_win64.zip *
           cd ..
@@ -91,6 +92,7 @@ jobs:
           cp -r bin/* package/bin/w32
           cp -r include/* package/include
           cp -r lib/* package/lib/i686
+          cp install.bat package
           cd package
           zip -r ../cMDA_win32.zip *
           cd ..
